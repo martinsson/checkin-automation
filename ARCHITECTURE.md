@@ -1495,7 +1495,38 @@ git push origin main --tags
 
 ## 9. Development Roadmap
 
-### Phase 1: MVP (Weeks 1-3)
+### Phase 0: Walking Skeleton (Week 1)
+
+**Goal**: Prove the end-to-end message flow works — a guest message arrives via Smoobu and reaches the cleaning agent, and a cleaning agent reply flows back toward the guest. No AI, no business logic, no database — just the communication plumbing.
+
+**Scope**:
+1. **Smoobu → Cleaning Agent**: Receive a Smoobu webhook (guest message), extract the message text, and forward it to the cleaning agent via email (SMTP).
+2. **Cleaning Agent → Smoobu**: Poll for cleaning agent email replies (IMAP), and send that reply back as a guest message through the Smoobu API.
+
+**What this proves**:
+- Smoobu webhook ingestion works
+- Email sending to cleaning agents works
+- Email receiving from cleaning agents works
+- Smoobu API reply to guests works
+- The full round-trip communication path is functional
+
+**Out of scope for Phase 0**:
+- AI/Claude integration (messages are forwarded as-is)
+- Database persistence
+- Trello task creation
+- Door code management
+- Business rules, escalation, timeouts
+- Error handling beyond basic logging
+
+**Deliverables**:
+- [ ] Smoobu webhook endpoint that receives guest messages
+- [ ] Email sender that forwards the guest message to a configured cleaning agent address
+- [ ] Email poller that checks for cleaning agent replies
+- [ ] Smoobu API caller that sends the reply back to the guest conversation
+- [ ] Minimal config (Smoobu API key, email credentials, cleaning agent address)
+- [ ] Manual end-to-end test: send a message as a guest in Smoobu → verify cleaning agent receives email → reply to email → verify guest sees the reply in Smoobu
+
+### Phase 1: MVP (Weeks 2-4)
 - [x] Database schema
 - [ ] Smoobu webhook endpoint
 - [ ] AI integration (Claude API)
