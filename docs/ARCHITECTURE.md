@@ -1497,18 +1497,18 @@ git push origin main --tags
 
 ### Phase 0: Walking Skeleton (Week 1)
 
-**Goal**: Prove the end-to-end message flow works — a guest message arrives via Smoobu and reaches the cleaning agent, and a cleaning agent reply flows back toward the guest. No AI, no business logic, no database — just the communication plumbing.
+**Goal**: Prove the end-to-end message flow works through Smoobu — a guest message is read from Smoobu and forwarded to the cleaning agent via Smoobu, and the cleaning agent's reply is sent back to the guest via Smoobu. No AI, no business logic, no database — just the Smoobu integration plumbing.
+
+**Key insight**: Smoobu is the single integration point for all messaging. It abstracts away the underlying channels (Airbnb, Booking.com, email). Our application only talks to the Smoobu API — how messages are delivered to guests or cleaning agents (email, platform message, etc.) is Smoobu's concern, not ours.
 
 **Scope**:
-1. **Smoobu → Cleaning Agent**: Receive a Smoobu webhook (guest message), extract the message text, and forward it to the cleaning agent via email (SMTP).
-2. **Cleaning Agent → Smoobu**: Poll for cleaning agent email replies (IMAP), and send that reply back as a guest message through the Smoobu API.
+1. **Guest → Cleaning Agent**: Receive/poll guest messages from Smoobu, forward them to the cleaning agent through Smoobu messaging.
+2. **Cleaning Agent → Guest**: Receive/poll cleaning agent replies from Smoobu, send the reply back to the guest through Smoobu messaging.
 
 **What this proves**:
-- Smoobu webhook ingestion works
-- Email sending to cleaning agents works
-- Email receiving from cleaning agents works
-- Smoobu API reply to guests works
-- The full round-trip communication path is functional
+- Reading messages from Smoobu works
+- Sending messages through Smoobu works
+- The full round-trip communication path (guest ↔ cleaning agent) is functional via Smoobu
 
 **Out of scope for Phase 0**:
 - AI/Claude integration (messages are forwarded as-is)
@@ -1519,12 +1519,11 @@ git push origin main --tags
 - Error handling beyond basic logging
 
 **Deliverables**:
-- [ ] Smoobu webhook endpoint that receives guest messages
-- [ ] Email sender that forwards the guest message to a configured cleaning agent address
-- [ ] Email poller that checks for cleaning agent replies
-- [ ] Smoobu API caller that sends the reply back to the guest conversation
-- [ ] Minimal config (Smoobu API key, email credentials, cleaning agent address)
-- [ ] Manual end-to-end test: send a message as a guest in Smoobu → verify cleaning agent receives email → reply to email → verify guest sees the reply in Smoobu
+- [ ] Smoobu API client that can read messages (guest and cleaning agent)
+- [ ] Smoobu API client that can send messages (to guest and cleaning agent)
+- [ ] Message forwarding logic: guest message → cleaning agent, cleaning agent reply → guest
+- [ ] Minimal config (Smoobu API key, cleaning agent identifier)
+- [ ] Manual end-to-end test: send a message as a guest in Smoobu → verify cleaning agent receives it → cleaning agent replies → verify guest sees the reply
 
 ### Phase 1: MVP (Weeks 2-4)
 - [x] Database schema
