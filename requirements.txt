@@ -1,6 +1,9 @@
 # Communication adapters
 imapclient>=3.0.0
 
+# HTTP client (Smoobu API)
+requests>=2.31
+
 # Testing
 pytest>=8.0
 pytest-asyncio>=0.24
