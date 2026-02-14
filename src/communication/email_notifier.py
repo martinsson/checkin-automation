@@ -2,6 +2,7 @@ import email as email_lib
 import email.utils
 import re
 import smtplib
+from email.header import decode_header as _decode_header
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
 
@@ -66,7 +67,7 @@ class EmailCleanerNotifier(CleanerNotifier):
                 raw_bytes = data[b"RFC822"]
                 msg = email_lib.message_from_bytes(raw_bytes)
 
-                subject = msg["Subject"] or ""
+                subject = self._decode_subject(msg["Subject"] or "")
                 request_id = self._extract_request_id(subject)
 
                 if request_id:
@@ -81,6 +82,14 @@ class EmailCleanerNotifier(CleanerNotifier):
                     client.set_flags([uid], [b"\\Seen"])
 
         return responses
+
+    @staticmethod
+    def _decode_subject(subject: str) -> str:
+        parts = _decode_header(subject)
+        return "".join(
+            t.decode(enc or "utf-8") if isinstance(t, bytes) else t
+            for t, enc in parts
+        )
 
     @staticmethod
     def _extract_request_id(subject: str) -> str | None:
