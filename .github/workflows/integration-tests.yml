@@ -1,0 +1,35 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main, master, "claude/**"]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  email-roundtrip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run email integration tests
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          CLEANER_EMAIL: ${{ secrets.CLEANER_EMAIL }}
+          CLEANER_EMAIL_PASSWORD: ${{ secrets.CLEANER_EMAIL_PASSWORD }}
+          EMAIL_SMTP_HOST: smtp.gmail.com
+          EMAIL_SMTP_PORT: "587"
+          EMAIL_IMAP_HOST: imap.gmail.com
+          EMAIL_IMAP_PORT: "993"
+        run: pytest tests/test_email_roundtrip.py -v -s
