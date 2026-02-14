@@ -453,3 +453,168 @@ guests and cleaners. We now know Smoobu only supports guest ↔ host messaging.
 
 This is actually *better* than the original plan — the console adapter lets us
 test the full flow without needing a Gmail account set up.
+
+---
+
+## 10. The Second Port: `SmoobuGateway`
+
+Smoobu is the other external integration. Same hexagonal pattern: a port defines
+what the business logic needs, adapters provide real and simulated implementations.
+
+```python
+# src/adapters/ports.py
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass
+class GuestMessage:
+    """A message from a guest, read from Smoobu."""
+    message_id: int
+    subject: str
+    body: str
+
+
+class SmoobuGateway(ABC):
+    """
+    Port: how we interact with Smoobu for guest messaging.
+
+    The business logic depends ONLY on this interface.
+    """
+
+    @abstractmethod
+    def get_messages(self, reservation_id: int) -> list[GuestMessage]:
+        """Read all messages for a reservation."""
+        ...
+
+    @abstractmethod
+    def send_message(self, reservation_id: int, subject: str, body: str) -> None:
+        """Send a message to the guest on a reservation."""
+        ...
+```
+
+### Real adapter: `SmoobuClient`
+
+Uses the `requests` library to call the Smoobu REST API.
+
+```python
+# src/adapters/smoobu_client.py
+
+class SmoobuClient(SmoobuGateway):
+    BASE_URL = "https://login.smoobu.com/api"
+
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+
+    def get_messages(self, reservation_id):
+        # GET /reservations/{id}/messages
+        ...
+
+    def send_message(self, reservation_id, subject, body):
+        # POST /reservations/{id}/messages/send-message-to-guest
+        ...
+```
+
+### Simulator adapter: `SimulatorSmoobuGateway`
+
+In-memory fake. No mocking framework — just a plain Python class that records
+sent messages and lets tests inject guest messages.
+
+```python
+# src/adapters/simulator_smoobu.py
+
+class SimulatorSmoobuGateway(SmoobuGateway):
+    def __init__(self):
+        self._messages: dict[int, list[GuestMessage]] = {}
+        self._sent: list[tuple[int, str, str]] = []
+
+    def inject_guest_message(self, reservation_id, subject, body):
+        """Test helper: simulate a guest sending a message."""
+        ...
+
+    def get_messages(self, reservation_id):
+        return self._messages.get(reservation_id, [])
+
+    def send_message(self, reservation_id, subject, body):
+        self._sent.append((reservation_id, subject, body))
+        # Also add to messages so get_messages sees it
+        ...
+```
+
+---
+
+## 11. Testing Strategy
+
+Two external integrations tested independently with integration tests, plus
+simulators for testing the full roundtrip in-memory. No mocking framework.
+
+### Layer 1: Email integration test (exists)
+
+`tests/test_email_roundtrip.py` — already implemented.
+
+- Tests `EmailCleanerNotifier` with real Gmail accounts
+- Send query → cleaner replies → poll and find the reply
+- Skipped if credentials are not set
+
+### Layer 2: Smoobu integration test (new)
+
+`tests/test_smoobu_roundtrip.py` — tests `SmoobuClient` against the real API.
+
+- Read messages for a test booking
+- Send a message to the test booking
+- Read messages again, verify the new message appears
+- Skipped if `SMOOBU_API_KEY` is not set
+
+```
+send_message(booking, "test subject", "test body")
+messages_after = get_messages(booking)
+assert any message contains "test body"
+```
+
+### Layer 3: Roundtrip test with simulators (new)
+
+`tests/test_roundtrip.py` — tests the full message flow in-memory.
+
+Uses `SimulatorSmoobuGateway` + `ConsoleCleanerNotifier` (which already has
+`simulate_response`). No network, no credentials, runs anywhere.
+
+```
+1. Inject a guest message into SimulatorSmoobuGateway
+2. Orchestrator reads it, forwards to ConsoleCleanerNotifier
+3. Simulate a cleaner response via ConsoleCleanerNotifier.simulate_response()
+4. Orchestrator polls the response, sends reply via SimulatorSmoobuGateway
+5. Assert: SimulatorSmoobuGateway recorded the outgoing reply
+```
+
+This proves the orchestration logic wires correctly without any external
+dependency.
+
+### Summary
+
+| Test file | What it proves | External deps? |
+|---|---|---|
+| `test_email_roundtrip.py` | Email send/receive works | Gmail SMTP/IMAP |
+| `test_smoobu_roundtrip.py` | Smoobu read/send works | Smoobu API |
+| `test_roundtrip.py` | Full orchestration wires correctly | None |
+
+---
+
+## 12. Updated File List
+
+### New files (this iteration)
+
+| File | Purpose |
+|---|---|
+| `src/adapters/ports.py` | Port: `SmoobuGateway` ABC + `GuestMessage` dataclass |
+| `src/adapters/smoobu_client.py` | Adapter: real Smoobu HTTP client |
+| `src/adapters/simulator_smoobu.py` | Simulator: in-memory fake for testing |
+| `tests/test_smoobu_roundtrip.py` | Integration test: real Smoobu API |
+| `tests/test_roundtrip.py` | Roundtrip test: simulators only |
+
+### Files to modify
+
+| File | Change |
+|---|---|
+| `requirements.txt` | Add `requests` |
+| `.env.example` | Already has `SMOOBU_API_KEY` and `TEST_BOOKING_ID` |
