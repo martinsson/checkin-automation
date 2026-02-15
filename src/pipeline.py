@@ -4,20 +4,22 @@ Main processing pipeline.
 Wires together all ports following the plan principle:
   AI → data → code → AI
 
+Nothing is sent directly — every outgoing message is saved as a draft
+in the RequestMemory for the owner to review, approve, or reject.
+
 Flow:
   1. AI: classify guest intent → ClassificationResult
   2. Code: check memory, decide whether to proceed
-  3. Code: ask cleaner (CleanerNotifier)
+  3. AI: compose acknowledgment + cleaner query → saved as drafts
+  --- owner reviews and sends manually ---
   4. AI: parse cleaner response → ParsedResponse
-  5. Code: decide auto-reply vs escalate to owner
-  6. AI: compose guest reply → ComposedReply
-  7. Code: send via Smoobu or notify owner
+  5. AI: compose guest reply → saved as draft
+  --- owner reviews and sends manually ---
 """
 
 from dataclasses import dataclass
 from typing import Literal
 
-from src.adapters.ports import SmoobuGateway
 from src.communication.ports import CleanerNotifier, CleanerQuery, CleanerResponse
 from src.domain.intent import ConversationContext, IntentClassifier
 from src.domain.memory import RequestMemory
@@ -26,20 +28,14 @@ from src.domain.response import GuestAcknowledger, ReplyComposer, ResponseParser
 import uuid
 
 
-# Threshold below which we escalate to the owner instead of acting.
-CONFIDENCE_THRESHOLD = 0.6
-
-
 @dataclass
 class PipelineConfig:
-    smoobu: SmoobuGateway
     cleaner: CleanerNotifier
     classifier: IntentClassifier
     acknowledger: GuestAcknowledger
     parser: ResponseParser
     composer: ReplyComposer
     memory: RequestMemory
-    owner_contact: str = "owner"     # placeholder for owner notification
 
 
 @dataclass
@@ -47,12 +43,12 @@ class PipelineResult:
     action: Literal[
         "ignored",           # intent == "other"
         "already_processed", # memory says we handled this before
-        "followup_sent",     # asked guest a clarifying question
-        "cleaner_queried",   # sent query to cleaner, waiting for reply
-        "replied_to_guest",  # auto-replied to guest
-        "escalated_to_owner",# sent suggested response to owner
+        "followup_drafted",  # follow-up question saved as draft
+        "drafts_created",    # acknowledgment + cleaner query saved as drafts
+        "reply_drafted",     # guest reply saved as draft after cleaner response
     ]
     details: str = ""
+    request_id: str = ""
 
 
 class Pipeline:
@@ -72,7 +68,7 @@ class Pipeline:
         message: str,
         context: ConversationContext,
     ) -> PipelineResult:
-        """Step 1–3: classify, check memory, query cleaner."""
+        """Classify intent, generate drafts for owner review."""
 
         # Step 1: AI classifies intent
         result = await self._cfg.classifier.classify(message, context)
@@ -87,25 +83,33 @@ class Pipeline:
                 details=f"intent={result.intent}",
             )
 
-        # If AI needs more info, ask the guest a follow-up question
-        if result.needs_followup and result.followup_question:
-            self._cfg.smoobu.send_message(
-                reservation_id,
-                subject="",
-                body=result.followup_question,
-            )
-            return PipelineResult(action="followup_sent", details=result.followup_question)
+        request_id = str(uuid.uuid4())
 
-        # Step 3: acknowledge to guest — "we're on it"
-        ack = await self._cfg.acknowledger.compose_acknowledgment(result, context)
-        self._cfg.smoobu.send_message(
-            reservation_id,
-            subject="",
-            body=ack.body,
+        # Save the request in memory
+        await self._cfg.memory.save_request(
+            reservation_id, result.intent, request_id, message,
         )
 
-        # Step 4: forward to cleaner
-        request_id = str(uuid.uuid4())
+        # If AI needs more info, draft a follow-up question
+        if result.needs_followup and result.followup_question:
+            await self._cfg.memory.save_draft(
+                request_id, reservation_id, result.intent,
+                "followup", result.followup_question,
+            )
+            return PipelineResult(
+                action="followup_drafted",
+                details=result.followup_question,
+                request_id=request_id,
+            )
+
+        # Step 3: AI composes acknowledgment → saved as draft
+        ack = await self._cfg.acknowledger.compose_acknowledgment(result, context)
+        await self._cfg.memory.save_draft(
+            request_id, reservation_id, result.intent,
+            "acknowledgment", ack.body,
+        )
+
+        # Step 4: prepare cleaner query → saved as draft
         query = CleanerQuery(
             request_id=request_id,
             cleaner_name="Marie",               # TODO: look up from config
@@ -125,16 +129,21 @@ class Pipeline:
             ),
             message=message,
         )
-        await self._cfg.cleaner.send_query(query)
-
-        await self._cfg.memory.mark_processed(
-            reservation_id, result.intent, "pending_cleaner", request_id
+        await self._cfg.memory.save_draft(
+            request_id, reservation_id, result.intent,
+            "cleaner_query", query.message,
         )
 
-        return PipelineResult(action="cleaner_queried", details=f"request_id={request_id}")
+        await self._cfg.memory.update_status(request_id, "pending_acknowledgment")
+
+        return PipelineResult(
+            action="drafts_created",
+            details=f"acknowledgment + cleaner_query drafted",
+            request_id=request_id,
+        )
 
     async def process_cleaner_responses(self) -> list[PipelineResult]:
-        """Steps 4–7: parse cleaner responses and act on them."""
+        """Parse cleaner responses and save guest reply drafts."""
         responses = await self._cfg.cleaner.poll_responses()
         results = []
         for response in responses:
@@ -145,45 +154,41 @@ class Pipeline:
     async def _handle_cleaner_response(
         self, response: CleanerResponse
     ) -> PipelineResult:
-        # We need the original query to compose the reply.
-        # For now, store it on the response (the cleaner notifier embeds it).
-        # In a full implementation, we'd look it up from persistent storage.
-        # For the simulator we use a stub query derived from the response.
+        # Look up the original request from memory
+        req = await self._cfg.memory.get_request(response.request_id)
+
+        # Build the query context for the AI to compose a reply
         stub_query = CleanerQuery(
             request_id=response.request_id,
             cleaner_name="Marie",
             guest_name="Guest",
             property_name="Le Matisse",
-            request_type="early_checkin",
+            request_type=req.intent if req else "early_checkin",
             original_time="15:00",
             requested_time="12:00",
             date="2026-01-01",
-            message="(original message not stored yet)",
+            message=req.guest_message if req else "(unknown)",
         )
 
-        # Step 4: AI parses cleaner's reply
+        # AI parses cleaner's reply
         parsed = await self._cfg.parser.parse(response.raw_text, stub_query)
 
-        # Step 5: decide — auto-reply or escalate?
-        if parsed.confidence < CONFIDENCE_THRESHOLD or parsed.answer == "unclear":
-            # Escalate to owner with a suggested response draft
-            draft = await self._cfg.composer.compose(parsed, stub_query)
-            owner_msg = (
-                f"[Suggested response for {stub_query.property_name} "
-                f"/ booking {stub_query.request_id}]\n\n"
-                f"{draft.body}\n\n"
-                f"(confidence: {parsed.confidence:.0%} — please review before sending)"
-            )
-            # TODO: send via owner notification port; for now log to console
-            print(f"\nEscalated to owner:\n{owner_msg}\n")
-            return PipelineResult(action="escalated_to_owner", details=owner_msg[:80])
-
-        # Step 6: AI composes guest reply
+        # AI composes guest reply
         reply = await self._cfg.composer.compose(parsed, stub_query)
 
-        # Step 7: send to guest via Smoobu
-        # NOTE: we'd need the reservation_id — in the full implementation
-        # this comes from persistent storage keyed by request_id.
-        # For now we log the reply (the pipeline test verifies the calls).
-        print(f"\nAuto-reply to guest:\n{reply.body}\n")
-        return PipelineResult(action="replied_to_guest", details=reply.body[:80])
+        # Save as draft for owner review
+        reservation_id = req.reservation_id if req else 0
+        intent = req.intent if req else "early_checkin"
+        await self._cfg.memory.save_draft(
+            response.request_id, reservation_id, intent,
+            "guest_reply", reply.body,
+        )
+
+        if req:
+            await self._cfg.memory.update_status(response.request_id, "pending_reply")
+
+        return PipelineResult(
+            action="reply_drafted",
+            details=reply.body[:80],
+            request_id=response.request_id,
+        )

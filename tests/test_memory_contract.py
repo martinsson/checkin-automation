@@ -1,14 +1,12 @@
 """
-RequestMemory contract tests.
-
-Runs the shared contract against every RequestMemory implementation.
+RequestMemory contract tests — run against SQLite with :memory:.
 """
 
-from src.adapters.memory_simulator import InMemoryRequestMemory
+from src.adapters.sqlite_memory import SqliteRequestMemory
 from tests.contracts.request_memory_contract import RequestMemoryContract
 
 
-class TestInMemoryRequestMemory(RequestMemoryContract):
+class TestSqliteRequestMemory(RequestMemoryContract):
 
     def create_memory(self):
-        return InMemoryRequestMemory()
+        return SqliteRequestMemory(":memory:")

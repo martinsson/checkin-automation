@@ -3,18 +3,18 @@ Full pipeline tests using all simulators.
 
 No network, no credentials, no LLM API calls.
 The test exercises the complete flow end-to-end.
+Everything is draft-based — nothing is sent directly.
 """
 
 import pytest
 
-from src.adapters.memory_simulator import InMemoryRequestMemory
+from src.adapters.sqlite_memory import SqliteRequestMemory
 from src.adapters.simulator_intent import SimulatorIntentClassifier
 from src.adapters.simulator_response import (
     SimulatorGuestAcknowledger,
     SimulatorReplyComposer,
     SimulatorResponseParser,
 )
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
 from src.communication.console_notifier import ConsoleCleanerNotifier
 from src.domain.intent import ConversationContext
 from src.pipeline import Pipeline, PipelineConfig
@@ -36,24 +36,18 @@ def _ctx():
 
 
 @pytest.fixture
-def smoobu():
-    return SimulatorSmoobuGateway()
-
-
-@pytest.fixture
 def cleaner():
     return ConsoleCleanerNotifier()
 
 
 @pytest.fixture
 def memory():
-    return InMemoryRequestMemory()
+    return SqliteRequestMemory(":memory:")
 
 
 @pytest.fixture
-def pipeline(smoobu, cleaner, memory):
+def pipeline(cleaner, memory):
     cfg = PipelineConfig(
-        smoobu=smoobu,
         cleaner=cleaner,
         classifier=SimulatorIntentClassifier(),
         acknowledger=SimulatorGuestAcknowledger(),
@@ -80,21 +74,30 @@ async def test_other_intent_is_ignored(pipeline):
 
 
 @pytest.mark.asyncio
-async def test_early_checkin_triggers_cleaner_query(pipeline, cleaner, smoobu):
+async def test_early_checkin_creates_drafts(pipeline, memory):
     result = await pipeline.process_message(
         RESERVATION_ID,
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement, vers 12h ?",
         _ctx(),
     )
-    assert result.action == "cleaner_queried"
-    # Cleaner notifier received the query
-    responses = await cleaner.poll_responses()
-    assert responses == []  # no reply yet
-    # An acknowledgment was sent to the guest via Smoobu
-    messages = smoobu.get_messages(RESERVATION_ID)
-    assert len(messages) == 1
-    ack_body = messages[0].body.lower()
-    assert "possible" in ack_body or "demande" in ack_body
+    assert result.action == "drafts_created"
+    assert result.request_id
+
+    # Two drafts saved: acknowledgment + cleaner_query
+    drafts = await memory.get_pending_drafts()
+    assert len(drafts) == 2
+    steps = [d.step for d in drafts]
+    assert "acknowledgment" in steps
+    assert "cleaner_query" in steps
+
+    # Acknowledgment draft body is non-empty
+    ack_draft = next(d for d in drafts if d.step == "acknowledgment")
+    assert len(ack_draft.draft_body) > 30
+
+    # Request is tracked in memory
+    req = await memory.get_request(result.request_id)
+    assert req is not None
+    assert req.status == "pending_acknowledgment"
 
 
 @pytest.mark.asyncio
@@ -106,7 +109,7 @@ async def test_same_intent_not_processed_twice(pipeline):
 
 
 @pytest.mark.asyncio
-async def test_early_and_late_are_independent(pipeline):
+async def test_early_and_late_are_independent(pipeline, memory):
     r1 = await pipeline.process_message(
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
@@ -117,22 +120,28 @@ async def test_early_and_late_are_independent(pipeline):
         "Puis-je partir tard le dernier jour, vers 13h ?",
         _ctx(),
     )
-    assert r1.action == "cleaner_queried"
-    assert r2.action == "cleaner_queried"
+    assert r1.action == "drafts_created"
+    assert r2.action == "drafts_created"
+
+    # 4 drafts total: 2 per request
+    drafts = await memory.get_pending_drafts()
+    assert len(drafts) == 4
 
 
 @pytest.mark.asyncio
-async def test_missing_time_triggers_followup(pipeline, smoobu):
+async def test_missing_time_drafts_followup(pipeline, memory):
     result = await pipeline.process_message(
         RESERVATION_ID,
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement ?",
         _ctx(),
     )
-    assert result.action == "followup_sent"
-    # A follow-up question was sent to the guest via Smoobu
-    messages = smoobu.get_messages(RESERVATION_ID)
-    assert len(messages) == 1
-    assert "heure" in messages[0].body.lower() or "?" in messages[0].body
+    assert result.action == "followup_drafted"
+
+    # A follow-up draft was saved
+    drafts = await memory.get_pending_drafts()
+    assert len(drafts) == 1
+    assert drafts[0].step == "followup"
+    assert "heure" in drafts[0].draft_body.lower() or "?" in drafts[0].draft_body
 
 
 # ---------------------------------------------------------------------------
@@ -141,32 +150,87 @@ async def test_missing_time_triggers_followup(pipeline, smoobu):
 
 
 @pytest.mark.asyncio
-async def test_yes_cleaner_response_replied_to_guest(pipeline, cleaner):
-    # First, trigger the cleaner query
-    await pipeline.process_message(
+async def test_cleaner_yes_creates_reply_draft(pipeline, memory, cleaner):
+    # First, trigger the pipeline to create drafts
+    result = await pipeline.process_message(
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
     )
 
-    # Cleaner replies yes
-    cleaner.simulate_response("any-id", "Oui, pas de problème !")
+    # Simulate cleaner responding yes
+    cleaner.simulate_response(result.request_id, "Oui, pas de problème !")
 
     results = await pipeline.process_cleaner_responses()
     assert len(results) == 1
-    assert results[0].action == "replied_to_guest"
+    assert results[0].action == "reply_drafted"
+
+    # Reply draft saved in memory (3 total: ack + cleaner_query + guest_reply)
+    drafts = await memory.get_pending_drafts()
+    assert len(drafts) == 3
+    reply_draft = next(d for d in drafts if d.step == "guest_reply")
+    assert len(reply_draft.draft_body) > 20
 
 
 @pytest.mark.asyncio
-async def test_unclear_cleaner_response_escalated(pipeline, cleaner):
-    await pipeline.process_message(
+async def test_cleaner_unclear_creates_reply_draft(pipeline, memory, cleaner):
+    result = await pipeline.process_message(
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
     )
 
-    cleaner.simulate_response("any-id", "Je verrai...")
+    cleaner.simulate_response(result.request_id, "Je verrai...")
 
     results = await pipeline.process_cleaner_responses()
     assert len(results) == 1
-    assert results[0].action == "escalated_to_owner"
+    # Even unclear responses get a draft — the owner decides what to do
+    assert results[0].action == "reply_drafted"
+
+
+# ---------------------------------------------------------------------------
+# Owner review workflow
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_owner_can_approve_draft(pipeline, memory):
+    result = await pipeline.process_message(
+        RESERVATION_ID,
+        "Puis-je arriver avant 15h, vers 12h ?",
+        _ctx(),
+    )
+
+    drafts = await memory.get_pending_drafts()
+    ack_draft = next(d for d in drafts if d.step == "acknowledgment")
+
+    await memory.review_draft(ack_draft.draft_id, "ok")
+
+    # Only 1 pending draft left (cleaner_query)
+    remaining = await memory.get_pending_drafts()
+    assert len(remaining) == 1
+    assert remaining[0].step == "cleaner_query"
+
+
+@pytest.mark.asyncio
+async def test_owner_can_reject_with_correction(pipeline, memory):
+    result = await pipeline.process_message(
+        RESERVATION_ID,
+        "Puis-je arriver avant 15h, vers 12h ?",
+        _ctx(),
+    )
+
+    drafts = await memory.get_pending_drafts()
+    ack_draft = next(d for d in drafts if d.step == "acknowledgment")
+
+    await memory.review_draft(
+        ack_draft.draft_id,
+        "nok",
+        actual_message_sent="My own version of the message",
+        owner_comment="Too formal for this guest",
+    )
+
+    reviewed = await memory.get_draft(ack_draft.draft_id)
+    assert reviewed.verdict == "nok"
+    assert reviewed.actual_message_sent == "My own version of the message"
+    assert reviewed.owner_comment == "Too formal for this guest"
