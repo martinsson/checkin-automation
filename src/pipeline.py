@@ -21,7 +21,7 @@ from src.adapters.ports import SmoobuGateway
 from src.communication.ports import CleanerNotifier, CleanerQuery, CleanerResponse
 from src.domain.intent import ConversationContext, IntentClassifier
 from src.domain.memory import RequestMemory
-from src.domain.response import ReplyComposer, ResponseParser
+from src.domain.response import GuestAcknowledger, ReplyComposer, ResponseParser
 
 import uuid
 
@@ -35,6 +35,7 @@ class PipelineConfig:
     smoobu: SmoobuGateway
     cleaner: CleanerNotifier
     classifier: IntentClassifier
+    acknowledger: GuestAcknowledger
     parser: ResponseParser
     composer: ReplyComposer
     memory: RequestMemory
@@ -95,7 +96,15 @@ class Pipeline:
             )
             return PipelineResult(action="followup_sent", details=result.followup_question)
 
-        # Step 3: forward to cleaner
+        # Step 3: acknowledge to guest — "we're on it"
+        ack = await self._cfg.acknowledger.compose_acknowledgment(result, context)
+        self._cfg.smoobu.send_message(
+            reservation_id,
+            subject="",
+            body=ack.body,
+        )
+
+        # Step 4: forward to cleaner
         request_id = str(uuid.uuid4())
         query = CleanerQuery(
             request_id=request_id,

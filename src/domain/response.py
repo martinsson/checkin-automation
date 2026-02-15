@@ -1,10 +1,11 @@
 """
-ResponseParser and ReplyComposer ports.
+ResponseParser, ReplyComposer, and GuestAcknowledger ports.
 
-ResponseParser: AI reads the cleaner's raw reply → structured data.
-ReplyComposer:  AI formulates that structured data → a nice guest message.
+GuestAcknowledger: sends a "we're on it" message right after intent detection.
+ResponseParser:    AI reads the cleaner's raw reply → structured data.
+ReplyComposer:     AI formulates that structured data → a nice guest message.
 
-Code (the pipeline) decides what to do between those two AI steps.
+Code (the pipeline) decides what to do between those AI steps.
 """
 
 from abc import ABC, abstractmethod
@@ -12,6 +13,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from src.communication.ports import CleanerQuery
+from src.domain.intent import ClassificationResult, ConversationContext
 
 
 @dataclass
@@ -28,6 +30,21 @@ class ComposedReply:
     """A ready-to-send message to the guest."""
     body: str
     confidence: float           # 0.0–1.0
+
+
+class GuestAcknowledger(ABC):
+    """
+    Port: compose an acknowledgment message to the guest confirming
+    we received their request and are looking into it.
+    """
+
+    @abstractmethod
+    async def compose_acknowledgment(
+        self,
+        classification: ClassificationResult,
+        context: ConversationContext,
+    ) -> ComposedReply:
+        ...
 
 
 class ResponseParser(ABC):

@@ -1,14 +1,16 @@
 """
-Simulator adapters for ResponseParser and ReplyComposer.
+Simulator adapters for GuestAcknowledger, ResponseParser, and ReplyComposer.
 
-Deterministic keyword-based implementations for tests — no LLM calls.
+Deterministic keyword/template-based implementations for tests — no LLM calls.
 """
 
 import re
 
 from src.communication.ports import CleanerQuery
+from src.domain.intent import ClassificationResult, ConversationContext
 from src.domain.response import (
     ComposedReply,
+    GuestAcknowledger,
     ParsedResponse,
     ReplyComposer,
     ResponseParser,
@@ -37,6 +39,34 @@ def _extract_time(text: str) -> str | None:
     if not m:
         return None
     return f"{int(m.group(1)):02d}:{int(m.group(2) or 0):02d}"
+
+
+class SimulatorGuestAcknowledger(GuestAcknowledger):
+
+    async def compose_acknowledgment(
+        self,
+        classification: ClassificationResult,
+        context: ConversationContext,
+    ) -> ComposedReply:
+        if classification.intent == "early_checkin":
+            req_label = "un check-in anticipé"
+        else:
+            req_label = "un départ tardif"
+
+        body = (
+            f"Bonjour {context.guest_name},\n\n"
+            f"Nous avons bien reçu votre demande pour {req_label}. "
+            f"Nous allons faire tout notre possible pour y répondre favorablement. "
+            f"Notre équipe de ménage est formidable pour réorganiser son planning "
+            f"et faire des trajets supplémentaires afin d'optimiser son emploi du temps — "
+            f"si c'est faisable, elle le fera !\n\n"
+            f"Cependant, les changements le jour même peuvent être délicats car "
+            f"l'équipe a besoin de suffisamment de temps pour préparer notre "
+            f"appartement ainsi que d'autres logements dans le même créneau.\n\n"
+            f"Nous vous tenons au courant dès que possible.\n\n"
+            f"Cordialement"
+        )
+        return ComposedReply(body=body, confidence=0.9)
 
 
 class SimulatorResponseParser(ResponseParser):
@@ -89,14 +119,20 @@ class SimulatorReplyComposer(ReplyComposer):
                 body = (
                     f"Bonjour {original_request.guest_name},\n\n"
                     f"Bonne nouvelle ! Un check-in anticipé à {time} est possible. "
-                    f"Nous vous attendons avec plaisir.\n\n"
+                    f"Il n'y a aucun frais supplémentaire pour cela. "
+                    f"Certains voyageurs laissent un petit pourboire à l'équipe de "
+                    f"ménage qui rend cela possible — c'est absolument pas obligatoire, "
+                    f"juste un geste si vous le souhaitez.\n\n"
                     f"Cordialement"
                 )
             else:
                 body = (
                     f"Bonjour {original_request.guest_name},\n\n"
                     f"Bonne nouvelle ! Un départ tardif jusqu'à {time} est possible. "
-                    f"Profitez bien !\n\n"
+                    f"Il n'y a aucun frais supplémentaire pour cela. "
+                    f"Certains voyageurs laissent un petit pourboire à l'équipe de "
+                    f"ménage qui rend cela possible — c'est absolument pas obligatoire, "
+                    f"juste un geste si vous le souhaitez.\n\n"
                     f"Cordialement"
                 )
             return ComposedReply(body=body, confidence=0.9)
@@ -106,16 +142,22 @@ class SimulatorReplyComposer(ReplyComposer):
                 body = (
                     f"Bonjour {original_request.guest_name},\n\n"
                     f"Malheureusement, un check-in anticipé n'est pas possible "
-                    f"pour votre séjour. L'heure d'arrivée standard est "
-                    f"{original_request.original_time}.\n\n"
+                    f"pour votre séjour. Nous avons fait de notre mieux, mais les "
+                    f"changements le jour même sont parfois impossibles car l'équipe "
+                    f"de ménage a besoin de suffisamment de temps pour préparer "
+                    f"plusieurs appartements. "
+                    f"L'heure d'arrivée standard est {original_request.original_time}.\n\n"
                     f"Cordialement"
                 )
             else:
                 body = (
                     f"Bonjour {original_request.guest_name},\n\n"
                     f"Malheureusement, un départ tardif n'est pas possible "
-                    f"pour votre séjour. L'heure de départ standard est "
-                    f"{original_request.original_time}.\n\n"
+                    f"pour votre séjour. Nous avons fait de notre mieux, mais les "
+                    f"changements le jour même sont parfois impossibles car l'équipe "
+                    f"de ménage a besoin de suffisamment de temps pour préparer "
+                    f"plusieurs appartements. "
+                    f"L'heure de départ standard est {original_request.original_time}.\n\n"
                     f"Cordialement"
                 )
             return ComposedReply(body=body, confidence=0.9)

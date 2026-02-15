@@ -1,5 +1,5 @@
 """
-ResponseParser and ReplyComposer contract tests.
+GuestAcknowledger, ResponseParser, and ReplyComposer contract tests.
 
 Runs the shared contracts against:
   - Simulator adapters  (always, no API key needed)
@@ -10,9 +10,21 @@ import os
 
 import pytest
 
-from src.adapters.claude_response import ClaudeReplyComposer, ClaudeResponseParser
-from src.adapters.simulator_response import SimulatorReplyComposer, SimulatorResponseParser
-from tests.contracts.response_contract import ReplyComposerContract, ResponseParserContract
+from src.adapters.claude_response import (
+    ClaudeGuestAcknowledger,
+    ClaudeReplyComposer,
+    ClaudeResponseParser,
+)
+from src.adapters.simulator_response import (
+    SimulatorGuestAcknowledger,
+    SimulatorReplyComposer,
+    SimulatorResponseParser,
+)
+from tests.contracts.response_contract import (
+    GuestAcknowledgerContract,
+    ReplyComposerContract,
+    ResponseParserContract,
+)
 
 HAS_API_KEY = bool(os.environ.get("ANTHROPIC_API_KEY"))
 
@@ -20,6 +32,12 @@ HAS_API_KEY = bool(os.environ.get("ANTHROPIC_API_KEY"))
 # ---------------------------------------------------------------------------
 # Simulator adapters — always run
 # ---------------------------------------------------------------------------
+
+
+class TestSimulatorGuestAcknowledger(GuestAcknowledgerContract):
+
+    def create_acknowledger(self):
+        return SimulatorGuestAcknowledger()
 
 
 class TestSimulatorResponseParser(ResponseParserContract):
@@ -37,6 +55,13 @@ class TestSimulatorReplyComposer(ReplyComposerContract):
 # ---------------------------------------------------------------------------
 # Claude adapters — skipped without API key
 # ---------------------------------------------------------------------------
+
+
+@pytest.mark.skipif(not HAS_API_KEY, reason="ANTHROPIC_API_KEY not set")
+class TestClaudeGuestAcknowledger(GuestAcknowledgerContract):
+
+    def create_acknowledger(self):
+        return ClaudeGuestAcknowledger()
 
 
 @pytest.mark.skipif(not HAS_API_KEY, reason="ANTHROPIC_API_KEY not set")

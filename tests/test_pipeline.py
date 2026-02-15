@@ -9,7 +9,11 @@ import pytest
 
 from src.adapters.memory_simulator import InMemoryRequestMemory
 from src.adapters.simulator_intent import SimulatorIntentClassifier
-from src.adapters.simulator_response import SimulatorReplyComposer, SimulatorResponseParser
+from src.adapters.simulator_response import (
+    SimulatorGuestAcknowledger,
+    SimulatorReplyComposer,
+    SimulatorResponseParser,
+)
 from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
 from src.communication.console_notifier import ConsoleCleanerNotifier
 from src.domain.intent import ConversationContext
@@ -52,6 +56,7 @@ def pipeline(smoobu, cleaner, memory):
         smoobu=smoobu,
         cleaner=cleaner,
         classifier=SimulatorIntentClassifier(),
+        acknowledger=SimulatorGuestAcknowledger(),
         parser=SimulatorResponseParser(),
         composer=SimulatorReplyComposer(),
         memory=memory,
@@ -75,7 +80,7 @@ async def test_other_intent_is_ignored(pipeline):
 
 
 @pytest.mark.asyncio
-async def test_early_checkin_triggers_cleaner_query(pipeline, cleaner):
+async def test_early_checkin_triggers_cleaner_query(pipeline, cleaner, smoobu):
     result = await pipeline.process_message(
         RESERVATION_ID,
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement, vers 12h ?",
@@ -85,6 +90,11 @@ async def test_early_checkin_triggers_cleaner_query(pipeline, cleaner):
     # Cleaner notifier received the query
     responses = await cleaner.poll_responses()
     assert responses == []  # no reply yet
+    # An acknowledgment was sent to the guest via Smoobu
+    messages = smoobu.get_messages(RESERVATION_ID)
+    assert len(messages) == 1
+    ack_body = messages[0].body.lower()
+    assert "possible" in ack_body or "demande" in ack_body
 
 
 @pytest.mark.asyncio
