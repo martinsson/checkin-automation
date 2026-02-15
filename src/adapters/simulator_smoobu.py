@@ -1,4 +1,4 @@
-from .ports import GuestMessage, SmoobuGateway
+from .ports import ActiveReservation, GuestMessage, SmoobuGateway
 
 
 class SimulatorSmoobuGateway(SmoobuGateway):
@@ -30,6 +30,14 @@ class SimulatorSmoobuGateway(SmoobuGateway):
 
     def get_messages(self, reservation_id: int) -> list[GuestMessage]:
         return list(self._messages.get(reservation_id, []))
+
+    def get_active_reservations(
+        self,
+        apartment_id: int,
+        arrival_from: str,
+        arrival_to: str,
+    ) -> list[ActiveReservation]:
+        return []
 
     def send_message(self, reservation_id: int, subject: str, body: str) -> None:
         self.sent.append((reservation_id, subject, body))
