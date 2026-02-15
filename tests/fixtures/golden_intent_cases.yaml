@@ -1,0 +1,572 @@
+# Golden test dataset for IntentClassifier
+#
+# Extracted from 34 real Smoobu conversation threads (Le Matisse apartment).
+# Each case has a trigger message to classify, surrounding context, and expected output.
+#
+# Fields:
+#   id: unique case identifier
+#   reservation_id: Smoobu reservation ID
+#   guest_name: guest name (null if not available in Smoobu data)
+#   language: fr or en
+#   messages: ordered list of messages providing context
+#     - role: guest (type=1) or host (type=2)
+#     - text: exact message content
+#     - is_trigger: true for the message the classifier should evaluate
+#   expected:
+#     intent: early_checkin | late_checkout | other
+#     confidence_min: minimum acceptable confidence (0.0-1.0)
+#     extracted_time: time the classifier should extract (nullable)
+#     needs_followup: whether the host needs to ask for more info
+#   notes: why this case is interesting for testing
+
+# =============================================================================
+# POSITIVE — early_checkin (10 cases)
+# =============================================================================
+
+- id: emilia_initial_vague
+  reservation_id: 120007226
+  guest_name: Emilia
+  language: fr
+  messages:
+    - role: host
+      text: "Top"
+      is_trigger: false
+    - role: guest
+      text: >-
+        Bonsoir, je voudrais savoir s'il serait possible d'accéder plus tôt
+        à l'appartement, car nous avons une cérémonie à 17 h et nous aimerions
+        déposer nos affaires.
+      is_trigger: true
+    - role: host
+      text: "Oui à partir de quelle heure souhaitez-vous accéder?"
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.8
+    extracted_time: null
+    needs_followup: true
+  notes: >-
+    Vague request with no specific time. "Accéder plus tôt" is indirect.
+    Mentions a ceremony at 17h (the standard checkin time) as context but
+    does not state a desired hour. guest_name is null in Smoobu data.
+
+- id: emilia_with_time
+  reservation_id: 120007226
+  guest_name: Emilia
+  language: fr
+  messages:
+    - role: host
+      text: "Oui à partir de quelle heure souhaitez-vous accéder?"
+      is_trigger: false
+    - role: guest
+      text: "16 heures serait parfait, merci beaucoup."
+      is_trigger: true
+    - role: host
+      text: "Ok c'est noté"
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.9
+    extracted_time: "16:00"
+    needs_followup: false
+
+  notes: >-
+    Follow-up to the vague request, now with a specific time.
+    Standalone, "16 heures serait parfait" is ambiguous — only makes sense
+    as early_checkin when read in context of the prior exchange.
+
+- id: shadia_mixed_with_code
+  reservation_id: 120007231
+  guest_name: Shadia Boujandir
+  language: fr
+  messages:
+    - role: host
+      text: >-
+        Bonjour Shadia, voici les instructions d'accès...
+      is_trigger: false
+    - role: guest
+      text: >-
+        Bonjour, merci pour votre message, malheureusement je n'arrive pas
+        à voir le code...
+
+        Si je souhaite arriver avant 17h y a t il un coût supplémentaire ?
+        Merci beaucoup
+        Bien cordialement
+      is_trigger: true
+    - role: host
+      text: >-
+        Bonjour Shania, je n'arrive pas à générer le code plus de 24 heures
+        à l'avance, je vous l'enverrai donc ce soir.
+
+        Pour l'horaire d'arrivée, la difficulté est que il y a quelqu'un qui
+        part le jour même donc il faut qu'on arrive à organiser le ménage,
+        pour quelle heure souhaiteriez-vous arriver ?
+
+        Bien cordialement
+        Johan
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.7
+    extracted_time: null
+    needs_followup: true
+
+  notes: >-
+    Early checkin request buried inside a message that starts with a different
+    concern (can't see the door code). Classifier must detect the second
+    paragraph. Also asks about extra cost, adding complexity.
+
+- id: adelaide_vague
+  reservation_id: 120491866
+  guest_name: Adélaïde Gacon
+  language: fr
+  messages:
+    - role: host
+      text: "Bonjour, voici les instructions d'accès..."
+      is_trigger: false
+    - role: guest
+      text: >-
+        Bonjour,
+        Est-ce possible d'arriver un peu plus tôt ? Si oui votre heure sera
+        la nôtre.
+        Merci
+      is_trigger: true
+    - role: host
+      text: "Bonjour je vais voir je reviens vers vous"
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.8
+    extracted_time: null
+    needs_followup: true
+
+  notes: >-
+    Very polite and deferential ("votre heure sera la nôtre") with no specific
+    time. "Un peu plus tôt" is vague. Sent on the day of arrival itself
+    (2025-12-20 at 11:33).
+
+- id: tami_early_checkin_no_time
+  reservation_id: 121135736
+  guest_name: Tami Crabtree
+  language: en
+  messages:
+    - role: host
+      text: "Bonjour, voici les instructions d'accès..."
+      is_trigger: false
+    - role: guest
+      text: >-
+        Hi, thanks for the info. Would early check in be an option? Thanks.
+        Happy New Year.
+      is_trigger: true
+  expected:
+    intent: early_checkin
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: true
+
+  notes: >-
+    Simple, direct request in English with no specific time. Uses the exact
+    phrase "early check in" — easy for keyword detection but has no time.
+    Host never responded before the next message came.
+
+- id: tami_luggage_dropoff
+  reservation_id: 121135736
+  guest_name: Tami Crabtree
+  language: en
+  messages:
+    - role: guest
+      text: >-
+        Hi, thanks for the info. Would early check in be an option? Thanks.
+        Happy New Year.
+      is_trigger: false
+    - role: guest
+      text: >-
+        Hi, we check out of our current place in Grenoble at noon. Could we
+        arrange for early luggage drop off?  Thanks!!
+      is_trigger: true
+    - role: host
+      text: "Hi Tami. Let me just check that with our cleaner."
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.8
+    extracted_time: "12:00"
+    needs_followup: false
+
+  notes: >-
+    Variant of early checkin — not asking to check in fully, but to drop off
+    luggage. Time is implied ("noon") via checkout from their other place.
+    Classifier must recognize "early luggage drop off" as a form of early_checkin.
+
+- id: adrien_16h
+  reservation_id: 120947421
+  guest_name: Adrien Bodolec
+  language: fr
+  messages:
+    - role: guest
+      text: >-
+        Bonjour.
+        Je souhaite avoir des informations complémentaires. Est-il possible
+        d'arriver 16h au lieu de 17h? Je voudrais également savoir si les
+        draps et serviettes de bains sont fournis.
+        Merci d'avance.
+      is_trigger: true
+    - role: host
+      text: "Bonjour Adrien. Oui 16h sera possible pas de problème"
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.9
+    extracted_time: "16:00"
+    needs_followup: false
+
+  notes: >-
+    Early checkin embedded in a pre-booking inquiry alongside a different
+    question (linens). "16h au lieu de 17h" is very precise, mentioning both
+    the requested and standard checkin time. Sent before booking confirmed.
+
+- id: adrien_reconfirm
+  reservation_id: 120947421
+  guest_name: Adrien Bodolec
+  language: fr
+  messages:
+    - role: host
+      text: "Bonjour, voici les instructions d'accès..."
+      is_trigger: false
+    - role: guest
+      text: >-
+        Bonsoir. Nous arriverons un peu plus tôt (vers 16h). L'appartement
+        sera-t-il accessible avec les codes d'accès ?
+      is_trigger: true
+    - role: host
+      text: "Oui normalement les codes sont déjà actifs"
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.85
+    extracted_time: "16:00"
+    needs_followup: false
+
+  notes: >-
+    Re-confirmation of the earlier request on arrival day, now phrased as a
+    statement of intent rather than a question. "Un peu plus tôt (vers 16h)"
+    combines vague language with a specific time in parentheses.
+
+- id: george_urgent_at_door
+  reservation_id: 125738476
+  guest_name: George Hart
+  language: en
+  messages:
+    - role: guest
+      text: "Hi guys. We are here early. Are we able to go in ahead of time please?"
+      is_trigger: true
+    - role: guest
+      text: "Sorry, I meant to ask earlier, but today has been a bad one"
+      is_trigger: false
+    - role: host
+      text: >-
+        Oh sure 2mins and I generate another code
+        Your current code iWorks only from 4 o'clock
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Most urgent form — guest is ALREADY at the door (15:32, code set for 16:00).
+    "We are here early" is a statement of fact combined with a request.
+    No time to coordinate with cleaner; requires immediate action.
+
+- id: clara_early_14h
+  reservation_id: 123068726
+  guest_name: Clara El Ferra
+  language: fr
+  messages:
+    - role: host
+      text: >-
+        Bonjour, est ce que pendant votre séjour vous allez faire du ski
+        et vous amenez votre matériel ?
+      is_trigger: false
+    - role: guest
+      text: >-
+        Bonsoir, merci beaucoup pour toutes ces informations !
+        Non, nous n'allons pas faire de ski, donc aucun souci.
+        Nous arriverons aux alentours de 14h, est-ce qu'il serait possible
+        d'y aller directement ?
+        Avec ce froid, c'est assez compliqué d'attendre longtemps dehors
+      is_trigger: true
+    - role: host
+      text: >-
+        Oui aucun souci, vous pouvez-vous mettre au chaud. Potentiellement
+        un artisan passera pour une fermeture de fenêtre dans l'après-midi...
+      is_trigger: false
+  expected:
+    intent: early_checkin
+    confidence_min: 0.85
+    extracted_time: "14:00"
+    needs_followup: false
+
+  notes: >-
+    Early checkin request buried in line 3 of a multi-topic message. First part
+    answers a ski question, then mentions 14h arrival (3 hours before standard
+    17h), with cold weather as the reason.
+
+# =============================================================================
+# POSITIVE — late_checkout (1 case)
+# =============================================================================
+
+- id: clara_late_checkout_train
+  reservation_id: 123068726
+  guest_name: Clara El Ferra
+  language: fr
+  messages:
+    - role: guest
+      text: "non pas de soucis ça peut attendre merci beaucoup. C'était simplement pour vous tenir informé"
+      is_trigger: false
+    - role: guest
+      text: >-
+        De plus,
+
+        Nous voulions savoir s'il serait éventuellement possible de partir
+        un peu plus tard demain.
+        Nous avons un train assez tard, vers 20h, donc si jamais une
+        flexibilité est possible, ce serait vraiment super !
+
+        Merci de votre compréhension
+        Bonne soirée
+        Clara
+      is_trigger: true
+    - role: host
+      text: >-
+        Cela complexifie l'organisation pour notre agent de ménage qui a prévu
+        d'arriver demain peu après 11h. Aussi passé 16h on rend impossible les
+        réservations dernière minute.
+
+        Seule solution que je peux imaginer si cela vous arrangera de rester
+        jusqu'au départ de train c'est de prendre une nuitée supplémentaire
+        pour lequel je pourrais à la rigueur ne vous facturer que la moitié.
+      is_trigger: false
+  expected:
+    intent: late_checkout
+    confidence_min: 0.85
+    extracted_time: "20:00"
+    needs_followup: false
+
+  notes: >-
+    Clear late_checkout request. Guest gives reason (train at 20h) and uses
+    polite hedging ("éventuellement", "si jamais"). Standard checkout is 11h,
+    so asking for up to 9 extra hours. Host response reveals operational impact.
+
+# =============================================================================
+# NEGATIVE BUT TRICKY — should classify as "other" (1 case)
+# =============================================================================
+
+- id: flora_stay_extension
+  reservation_id: 125377236
+  guest_name: Flora Josseaume
+  language: fr
+  messages:
+    - role: guest
+      text: >-
+        Bonjour Johan,
+        Je réserve votre appartement pour mon fils qui doit passer des concours
+        à Grenoble entre le 13 et le 22 avril. Si éventuellement une
+        prolongation est possible, faites-le-le moi savoir. Pouvez-Vous
+        également me confirmer que l'appartement est très calme.
+        Bien cordialement,
+      is_trigger: true
+    - role: host
+      text: >-
+        Bonjour Flora
+
+        Désolé pour le délai de réponse.
+        Oui c'est tout à fait possible de prolonger
+        Vous souhaiteriez du 13 au 22?
+      is_trigger: false
+  expected:
+    intent: other
+    confidence_min: 0.7
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Looks like late_checkout or schedule modification, but is actually a request
+    to EXTEND the booking by multiple additional nights. "Prolongation" might
+    confuse a naive classifier. This is a reservation modification, not a
+    checkin/checkout time adjustment.
+
+# =============================================================================
+# NEGATIVE — "other" (7 cases)
+# =============================================================================
+
+- id: mohamed_logistics
+  reservation_id: 120099456
+  guest_name: Mohamed Hakim Eljabiry
+  language: fr
+  messages:
+    - role: guest
+      text: "bonjour, nous venons travailler dans votre région.nous sommes trois"
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Pure logistics/confirmation. No timing requests. Brief message that could
+    be mistaken for urgency.
+
+- id: shadia_linens
+  reservation_id: 120007231
+  guest_name: Shadia Boujandir
+  language: fr
+  messages:
+    - role: guest
+      text: >-
+        Bonjour Johan, je suis de passage pour un mariage et votre appartement
+        me semble parfait pour ce petit séjour.
+
+        J ai un petite question est ce que les draps et les serviettes seront
+        fournis ?
+
+        Merci cordialement
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Pre-booking question about linens. Same guest who later asks for early
+    checkin (shadia_mixed_with_code), but this message is purely about amenities.
+
+- id: tami_shower_issue
+  reservation_id: 121135736
+  guest_name: Tami Crabtree
+  language: en
+  messages:
+    - role: guest
+      text: >-
+        Thanks! The accommodation is great. Just a couple of things
+        1) the water in the shower seems to be ending up all over the floor.
+        Perhaps we are not doing something right or it is not draining quickly
+        enough?
+        2) we could use a little more salt and a couple of laundry detergents,
+        is that something we need to purchase ourselves? Thanks!
+        Tami
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Mid-stay issue report about plumbing and supplies. Same guest who earlier
+    requested early checkin. No timing component.
+
+- id: clara_curtain_report
+  reservation_id: 123068726
+  guest_name: Clara El Ferra
+  language: fr
+  messages:
+    - role: guest
+      text: >-
+        Bonsoir Johan,
+
+        Merci beaucoup pour votre message.
+
+        Tout se passe très bien dans le logement, il est vraiment agréable.
+
+        Juste pour vous signaler deux petites choses : je ne sais pas si c'est
+        normal, mais la machine à laver bouge beaucoup lorsqu'elle est en
+        fonctionnement.
+        Et aussi, le premier jour de mon arrivée, en voulant fermer les
+        rideaux, la barre est tombée sur ma tête
+
+        À part ça, tout est parfait. Merci encore pour votre disponibilité.
+
+        Bonne soirée,
+        Clara!
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Mid-stay maintenance report (curtain rod, washing machine). Same guest who
+    asks for early checkin and late checkout in other messages.
+
+- id: emilia_departure
+  reservation_id: 120007226
+  guest_name: Emilia
+  language: fr
+  messages:
+    - role: guest
+      text: >-
+        Nous quittons votre Airbnb, merci beaucoup. C'est un endroit
+        magnifique, très accueillant et confortable.
+
+        Nous avons tout laissé conformément à vos instructions, à la
+        prochaine fois.
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Departure confirmation. "Quittons" (leaving) might trigger false positives
+    for checkout-related keywords. This is purely a goodbye message.
+
+- id: george_basin_report
+  reservation_id: 125738476
+  guest_name: George Hart
+  language: en
+  messages:
+    - role: guest
+      text: >-
+        All good, thanks.
+
+        FYI the plug in basin in bathroom doesn't come back up if you put it
+        down. I've put back up by reaching underneath for now, and no issue
+        for us. Letting you know for next people.
+      is_trigger: true
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Mid-stay maintenance report from the guest who urgently needed early checkin.
+    Purely informational — reporting a basin plug issue for future guests.
+
+- id: adrien_arrival_confirmation
+  reservation_id: 120947421
+  guest_name: Adrien Bodolec
+  language: fr
+  messages:
+    - role: guest
+      text: "Bonjour. Nous sommes bien arrivé dans l'appartement."
+      is_trigger: true
+    - role: host
+      text: "Parfait merci pour la confirmation"
+      is_trigger: false
+  expected:
+    intent: other
+    confidence_min: 0.9
+    extracted_time: null
+    needs_followup: false
+
+  notes: >-
+    Simple arrival confirmation. "Arrivé" could trigger false positives for
+    a keyword-based classifier looking for arrival-related terms. Same guest
+    who asked for early checkin in adrien_16h.
