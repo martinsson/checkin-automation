@@ -43,7 +43,7 @@ threads = []
 for b in bookings:
     bid = b["id"]
     reservation = session.get(f"https://login.smoobu.com/api/reservations/{bid}").json()
-    messages = session.get(f"https://login.smoobu.com/api/reservations/{bid}/messages").json().get("messages", [])
+    messages = session.get(f"https://login.smoobu.com/api/reservations/{bid}/messages", params={"onlyRelatedToGuest": "false"}).json().get("messages", [])
     threads.append(
         {
             "reservation_id": bid,
