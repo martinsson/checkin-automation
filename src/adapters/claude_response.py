@@ -1,5 +1,7 @@
 """
 Claude-powered adapters for ResponseParser and ReplyComposer.
+
+Prompts are loaded from src/prompts/*.txt.
 """
 
 import json
@@ -14,50 +16,7 @@ from src.domain.response import (
     ReplyComposer,
     ResponseParser,
 )
-
-_PARSER_SYSTEM = """
-You are an assistant that parses replies from Airbnb cleaning staff.
-
-Given the cleaner's raw reply and the original request context, extract:
-- answer: "yes", "no", "conditional", or "unclear"
-  * "yes": cleaner clearly agrees
-  * "no": cleaner clearly refuses
-  * "conditional": cleaner agrees but with conditions or a different time
-  * "unclear": cannot determine from the text
-- conditions: any conditions the cleaner mentioned (or null)
-- proposed_time: if the cleaner suggests a specific time (HH:MM format, or null)
-- confidence: your confidence in the parsing (0.0–1.0)
-
-Respond ONLY with valid JSON matching this schema:
-{
-  "answer": "yes" | "no" | "conditional" | "unclear",
-  "conditions": "<string>" | null,
-  "proposed_time": "<HH:MM>" | null,
-  "confidence": <float>
-}
-""".strip()
-
-_COMPOSER_SYSTEM = """
-You are an assistant that composes polite Airbnb host replies to guests.
-
-You are given structured information about a cleaner's decision and the
-original guest request. Write a warm, professional reply to the guest
-in the same language they used (detect from the guest name and context —
-default to French for French-speaking guests).
-
-Rules:
-- Be warm and concise (2–4 sentences)
-- Do NOT mention the cleaner or internal operations
-- If approved: confirm the new time clearly
-- If declined: apologise briefly and give the standard time
-- If conditional: explain the condition clearly
-
-Respond ONLY with valid JSON:
-{
-  "body": "<the message to send to the guest>",
-  "confidence": <float 0.0–1.0>
-}
-""".strip()
+from src.prompts import load_prompt
 
 
 class ClaudeResponseParser(ResponseParser):
@@ -65,6 +24,7 @@ class ClaudeResponseParser(ResponseParser):
     def __init__(self, api_key: str | None = None, model: str = "claude-haiku-4-5-20251001"):
         self._client = anthropic.Anthropic(api_key=api_key or os.environ["ANTHROPIC_API_KEY"])
         self._model = model
+        self._system_prompt = load_prompt("response_parser")
 
     async def parse(self, raw_text: str, original_request: CleanerQuery) -> ParsedResponse:
         user_content = (
@@ -79,7 +39,7 @@ class ClaudeResponseParser(ResponseParser):
         response = self._client.messages.create(
             model=self._model,
             max_tokens=256,
-            system=_PARSER_SYSTEM,
+            system=self._system_prompt,
             messages=[{"role": "user", "content": user_content}],
         )
 
@@ -103,6 +63,7 @@ class ClaudeReplyComposer(ReplyComposer):
     def __init__(self, api_key: str | None = None, model: str = "claude-haiku-4-5-20251001"):
         self._client = anthropic.Anthropic(api_key=api_key or os.environ["ANTHROPIC_API_KEY"])
         self._model = model
+        self._system_prompt = load_prompt("reply_composer")
 
     async def compose(
         self, parsed: ParsedResponse, original_request: CleanerQuery
@@ -123,7 +84,7 @@ class ClaudeReplyComposer(ReplyComposer):
         response = self._client.messages.create(
             model=self._model,
             max_tokens=512,
-            system=_COMPOSER_SYSTEM,
+            system=self._system_prompt,
             messages=[{"role": "user", "content": user_content}],
         )
 
