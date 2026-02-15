@@ -1,14 +1,14 @@
-name: Integration Tests
+name: Tests
 
 on:
   push:
     branches: [main, master, "claude/**"]
   pull_request:
     branches: [main, master]
-  workflow_dispatch: # allow manual trigger
+  workflow_dispatch:
 
 jobs:
-  email-roundtrip:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -22,14 +22,5 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run email integration tests
-        env:
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          CLEANER_EMAIL: ${{ secrets.CLEANER_EMAIL }}
-          CLEANER_EMAIL_PASSWORD: ${{ secrets.CLEANER_EMAIL_PASSWORD }}
-          EMAIL_SMTP_HOST: smtp.gmail.com
-          EMAIL_SMTP_PORT: "587"
-          EMAIL_IMAP_HOST: imap.gmail.com
-          EMAIL_IMAP_PORT: "993"
-        run: pytest tests/test_email_roundtrip.py -v -s
+      - name: Run tests
+        run: make test
