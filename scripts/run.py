@@ -109,7 +109,7 @@ async def poll_once(pipeline: Pipeline, smoobu: SmoobuClient, apartment_id: int,
             property_name=f"Apartment {res.apartment_id}",
             arrival_date=res.arrival,
             departure_date=res.departure,
-            default_checkin_time="15:00",
+            default_checkin_time="17:00",
             default_checkout_time="11:00",
             previous_messages=previous,
         )
