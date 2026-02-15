@@ -11,6 +11,17 @@ class GuestMessage:
     body: str
 
 
+@dataclass
+class ActiveReservation:
+    """A reservation that is currently active or upcoming."""
+
+    reservation_id: int
+    guest_name: str
+    arrival: str
+    departure: str
+    apartment_id: int
+
+
 class SmoobuGateway(ABC):
     """
     Port: how we interact with Smoobu for guest messaging.
@@ -28,4 +39,14 @@ class SmoobuGateway(ABC):
     @abstractmethod
     def send_message(self, reservation_id: int, subject: str, body: str) -> None:
         """Send a message to the guest on a reservation."""
+        ...
+
+    @abstractmethod
+    def get_active_reservations(
+        self,
+        apartment_id: int,
+        arrival_from: str,
+        arrival_to: str,
+    ) -> list[ActiveReservation]:
+        """Return reservations arriving between arrival_from and arrival_to (YYYY-MM-DD)."""
         ...
