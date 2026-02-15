@@ -1,0 +1,269 @@
+[
+  {
+    "reservation_id": 124495676,
+    "guest_name": "Joao Paulo Felismino",
+    "arrival": "2026-02-14",
+    "departure": "2026-02-20",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 591770716,
+        "subject": "",
+        "message": "Bonjour\nJe projète un séjour afin de profiter de Chamrousse avec mes 2 enfants",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-19 09:46:31"
+      },
+      {
+        "id": 605648392,
+        "subject": "",
+        "message": "Bonjour Johan,\n\nMerci pour ces infos.\nNous arriverons demain vers 18h-19h.\n\nVous souhaitant une agréable journée,",
+        "htmlMessage": "Bonjour Johan,\n\nMerci pour ces infos.\nNous arriverons demain vers 18h-19h.\n\nVous souhaitant une agréable journée,",
+        "type": 1,
+        "createdAt": "2026-02-13 11:18:33"
+      }
+    ]
+  },
+  {
+    "reservation_id": 121392741,
+    "guest_name": "Rose Chalmers",
+    "arrival": "2026-02-20",
+    "departure": "2026-02-21",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 576113001,
+        "subject": "",
+        "message": "Hi,\nMy husband  and I , two of our adult kids plus a boyfriend are driving from uk to Villard Reculas skiing - we are looking for a 1 night stop over to break the long journey before heading to the slopes early the next day- your place looks lovely ! Looking forward to the coffee already! \nBest wishes \nRose 😊",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-22 00:54:37"
+      },
+      {
+        "id": 576175211,
+        "subject": "",
+        "message": "Thank you so much for accepting our booking … so much lovelier than our usual F1 Hotel! 🤣 \nJust a quick question- we are coming in a Ford Ranger truck - is there suitable parking nearby ? ",
+        "htmlMessage": "Thank you so much for accepting our booking … so much lovelier than our usual F1 Hotel! 🤣 \nJust a quick question- we are coming in a Ford Ranger truck - is there suitable parking nearby ? ",
+        "type": 1,
+        "createdAt": "2025-12-22 11:31:26"
+      },
+      {
+        "id": 576217586,
+        "subject": "",
+        "message": "Ahh - is the street parking free of charge ?  I really hope that we can park nearby as it won’t work for us parking 1km away … 🥴",
+        "htmlMessage": "Ahh - is the street parking free of charge ?  I really hope that we can park nearby as it won’t work for us parking 1km away … 🥴",
+        "type": 1,
+        "createdAt": "2025-12-22 12:46:26"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126557951,
+    "guest_name": "Pauline Danguy",
+    "arrival": "2026-02-22",
+    "departure": "2026-02-27",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 600252256,
+        "subject": "",
+        "message": "Bonjour Johan,\nNous aimerions louer votre logement pour 5 nuits en semaine : du dimanche 22 février au soir au vendredi 27 matin. \nComme c’est une location en semaine et pour plusieurs jours, vous semble-t-il possible de nous faire une ristourne sur le prix ? Merci à vous, \nCordialement,\nPauline ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-02 19:12:06"
+      },
+      {
+        "id": 600252246,
+        "subject": "",
+        "message": "Malheureusement nous ne pourrons pas prendre le 21",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-02 21:10:07"
+      }
+    ]
+  },
+  {
+    "reservation_id": 127373101,
+    "guest_name": "Laure Fagnou",
+    "arrival": "2026-02-27",
+    "departure": "2026-02-28",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 603837511,
+        "subject": "",
+        "message": "Bonsoir,\nNous aimerions  savoir si les draps et serviettes sont fournies s il vous plaît? \nEst il possible de garer deux voitures ? \nMerci par avance de votre retour \nCordialement \nLaure",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-09 21:57:37"
+      },
+      {
+        "id": 603837501,
+        "subject": "",
+        "message": "Super, c est parfait on se débrouillera pour les places de parking.. merci beaucoup je fais la réservation de suite merci ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-09 22:02:50"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126964526,
+    "guest_name": "Amélie Badiou",
+    "arrival": "2026-03-01",
+    "departure": "2026-03-06",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 602002386,
+        "subject": "",
+        "message": "Bonjour,\nNous sommes trois étudiantes dont l’école se situe à Grenoble et nous sommes à la recherche d’un logement pour une semaine de cours par mois. \nCordialement.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-06 18:23:24"
+      },
+      {
+        "id": 602002376,
+        "subject": "",
+        "message": "Merci pour votre retour rapide. \nOui nous préférerions effectuer un premier séjour afin de nous rendre compte de la distance avec l’école, puis discuter de la récurrence par la suite, si cela vous convient également.\n\nBien cordialement,\nAmélie ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-06 19:03:07"
+      },
+      {
+        "id": 602010256,
+        "subject": "",
+        "message": "Super merci ! \nBonne soirée ",
+        "htmlMessage": "Super merci ! \nBonne soirée ",
+        "type": 1,
+        "createdAt": "2026-02-06 19:20:15"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123628101,
+    "guest_name": "Maria Toma",
+    "arrival": "2026-03-06",
+    "departure": "2026-03-08",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 588300901,
+        "subject": "",
+        "message": "Hi! We are 4 uni students attending UCL in London coming to visit our other friend who is on his study year abroad at the uni in Grenoble, so this is a great location for us to stay in. We're arriving at GNB at 11:10 on the 6th, but we'll probably see our friend first before the check-in at 17:00. We'll be ready to leave before 11:00 on the 8th as our flight will be at 15:50. We're very clean people and won't make much noise!",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-12 13:43:28"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126430971,
+    "guest_name": "Mia Wolff",
+    "arrival": "2026-03-20",
+    "departure": "2026-03-23",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 599746751,
+        "subject": "",
+        "message": "Hallo Johan, wir sind 5 Freunde, die gemeinsam letztes Jahr unseren Master in Grenoble gemacht haben. An dem Wochenende findet unsere Graduation statt für die wir aus Deutschland anreisen und wir würden die drei Tage gerne in deiner schönen Wohnung verbringen. Vielen Dank schonmal!",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-02 15:21:46"
+      },
+      {
+        "id": 599750881,
+        "subject": "",
+        "message": "Ja natürlich, wir werden keine Partys in der Wohnung feiern! Danke für die ganzen Infos und die Bestätigung 😊",
+        "htmlMessage": "Ja natürlich, wir werden keine Partys in der Wohnung feiern! Danke für die ganzen Infos und die Bestätigung 😊",
+        "type": 1,
+        "createdAt": "2026-02-02 20:09:04"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126916506,
+    "guest_name": "Sabrina Chezeau",
+    "arrival": "2026-04-06",
+    "departure": "2026-04-10",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 601770431,
+        "subject": "",
+        "message": "Bonjour. nous sommes 2 artistes qui venons travailler au théâtre Premol qui me semble pas tres loin a pied. est ce que vous me confirmez ?",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-06 12:45:37"
+      },
+      {
+        "id": 601782996,
+        "subject": "",
+        "message": "Merci beaucoup.  Au plaisir ",
+        "htmlMessage": "Merci beaucoup.  Au plaisir ",
+        "type": 1,
+        "createdAt": "2026-02-06 13:07:28"
+      }
+    ]
+  },
+  {
+    "reservation_id": 125377236,
+    "guest_name": "Flora Josseaume",
+    "arrival": "2026-04-13",
+    "departure": "2026-04-17",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 595345066,
+        "subject": "",
+        "message": "Bonjour Johan,\nJe réserve votre appartement pour mon fils qui doit passer des concours à Grenoble entre le 13 et le 22 avril. Si éventuellement une prolongation est possible, faites-le-le moi savoir. Pouvez-Vous également me confirmer que l’appartement est très calme.\nBien cordialement,",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-25 12:01:18"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126024871,
+    "guest_name": "Jean-Luc Lamperier",
+    "arrival": "2026-05-22",
+    "departure": "2026-05-26",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 597964691,
+        "subject": "",
+        "message": "Bonjour, Nous avons réservé votre gîte et nous aimerions savoir si le linge de maison (draps, couettes, oreillers, serviettes et torchons) sont à disposition car nous venons sur Grenoble en train ?\nNous vous remercions\ncdt\nJL Lamperier",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-30 15:43:32"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123206681,
+    "guest_name": "Steven Winslett",
+    "arrival": "2026-06-26",
+    "departure": "2026-06-29",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 586619826,
+        "subject": "",
+        "message": "My fiancee, her son and I are traveling through en route to Germany. I look forward to visiting your city. If our dates change a few days earlier or later, will that be a problem?",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-09 05:13:42"
+      }
+    ]
+  },
+  {
+    "reservation_id": 127226161,
+    "guest_name": "Lena Siegel",
+    "arrival": "2026-07-22",
+    "departure": "2026-07-26",
+    "channel": "Airbnb",
+    "messages": []
+  }
+]
