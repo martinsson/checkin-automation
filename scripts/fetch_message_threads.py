@@ -28,7 +28,7 @@ page = 1
 while True:
     resp = session.get(
         "https://login.smoobu.com/api/reservations",
-        params={"apartmentId": APARTMENT_ID, "pageSize": 100, "page": page},
+        params={"apartmentId": APARTMENT_ID, "pageSize": 100, "page": page, "departureFrom": "2020-01-01"},
     )
     data = resp.json()
     bookings.extend(data.get("bookings", []))

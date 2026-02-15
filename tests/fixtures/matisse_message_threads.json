@@ -1,5 +1,1347 @@
 [
   {
+    "reservation_id": 120007226,
+    "guest_name": null,
+    "arrival": "2025-12-05",
+    "departure": "2025-12-07",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373311,
+        "subject": "",
+        "message": "Bonjour, nous allons à Grenoble pour découvrir la ville et revoir de vieux amis. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-02 21:29:37"
+      },
+      {
+        "id": 568373296,
+        "subject": "",
+        "message": "Oui, il n'y a aucun problème, nous ne voulons pas faire la fête. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-02 22:24:18"
+      },
+      {
+        "id": 568373286,
+        "subject": "",
+        "message": "Bonsoir, je voudrais savoir s'il serait possible d'accéder plus tôt à l'appartement, car nous avons une cérémonie à 17 h et nous aimerions déposer nos affaires. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-04 17:27:21"
+      },
+      {
+        "id": 568373276,
+        "subject": "",
+        "message": "16 heures serait parfait, merci beaucoup. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-04 19:14:15"
+      },
+      {
+        "id": 568373256,
+        "subject": "",
+        "message": "Nous quittons votre Airbnb, merci beaucoup. C'est un endroit magnifique, très accueillant et confortable.\n\nNous avons tout laissé conformément à vos instructions, à la prochaine fois. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-07 11:00:34"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120099456,
+    "guest_name": "Mohamed Hakim Eljabiry",
+    "arrival": "2025-12-08",
+    "departure": "2025-12-12",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568802731,
+        "subject": "",
+        "message": "bonjour, nous venons travailler dans votre région.nous sommes trois",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-08 08:52:47"
+      },
+      {
+        "id": 568946756,
+        "subject": "",
+        "message": "Merci",
+        "htmlMessage": "Merci",
+        "type": 1,
+        "createdAt": "2025-12-08 12:47:16"
+      },
+      {
+        "id": 569289176,
+        "subject": "",
+        "message": "Bonjour.tout a passé bien.merci",
+        "htmlMessage": "Bonjour.tout a passé bien.merci",
+        "type": 1,
+        "createdAt": "2025-12-09 06:35:38"
+      },
+      {
+        "id": 571532106,
+        "subject": "",
+        "message": "Merci.vraiment bien passé ",
+        "htmlMessage": "Merci.vraiment bien passé ",
+        "type": 1,
+        "createdAt": "2025-12-13 11:57:47"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120007231,
+    "guest_name": "Shadia Boujandir",
+    "arrival": "2025-12-12",
+    "departure": "2025-12-14",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373371,
+        "subject": "",
+        "message": "Bonjour Johan, je suis de passage pour un mariage et votre appartement me semble parfait pour ce petit séjour. \n\nJ ai un petite question est ce que les draps et les serviettes seront fournis ? \n\nMerci cordialement ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-05 17:20:54"
+      },
+      {
+        "id": 568373361,
+        "subject": "",
+        "message": "Merci",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-05 17:23:12"
+      },
+      {
+        "id": 568373351,
+        "subject": "",
+        "message": "Merci, si c’est possible mais sinon ne vous embêter pas \nMerci encore",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-05 17:45:11"
+      },
+      {
+        "id": 570319606,
+        "subject": "",
+        "message": "Bonjour, merci pour votre message, malheureusement je n’arrive pas à voir le code… \n\nSi je souhaite arriver avant 17h y a t il un coût supplémentaire ? \nMerci beaucoup \nBien cordialement",
+        "htmlMessage": "Bonjour, merci pour votre message, malheureusement je n’arrive pas à voir le code… \n\nSi je souhaite arriver avant 17h y a t il un coût supplémentaire ? \nMerci beaucoup \nBien cordialement",
+        "type": 1,
+        "createdAt": "2025-12-11 07:42:50"
+      },
+      {
+        "id": 570347361,
+        "subject": "",
+        "message": "Ok merci beaucoup \n\nJe serai sur place à partir de 12h mais j irai chez mon papa. Donc pourriez vous m envoyer un petit message pour me dire quand l appartement sera disponible? \n\nMerci d avance 😊",
+        "htmlMessage": "Ok merci beaucoup \n\nJe serai sur place à partir de 12h mais j irai chez mon papa. Donc pourriez vous m envoyer un petit message pour me dire quand l appartement sera disponible? \n\nMerci d avance 😊",
+        "type": 1,
+        "createdAt": "2025-12-11 08:42:01"
+      },
+      {
+        "id": 570670656,
+        "subject": "",
+        "message": "Bonsoir, je vous remercie pour votre gentillesse, c’est très aimable de votre part de nous avoir mis à disposition l’appartement avant l’horaire prévu et sans supplément . 😊",
+        "htmlMessage": "Bonsoir, je vous remercie pour votre gentillesse, c’est très aimable de votre part de nous avoir mis à disposition l’appartement avant l’horaire prévu et sans supplément . 😊",
+        "type": 1,
+        "createdAt": "2025-12-11 19:04:39"
+      },
+      {
+        "id": 571269591,
+        "subject": "",
+        "message": "Bonsoir,\nJe souhaitais vous remercier pour le lit parapluie, les serviettes, ainsi que pour la mise à disposition anticipée de l’appartement sans frais supplémentaires. Nous apprécions également la propreté des lieux.\n\nNous nous y sentons très bien. Merci encore pour votre accueil.",
+        "htmlMessage": "Bonsoir,\nJe souhaitais vous remercier pour le lit parapluie, les serviettes, ainsi que pour la mise à disposition anticipée de l’appartement sans frais supplémentaires. Nous apprécions également la propreté des lieux.\n\nNous nous y sentons très bien. Merci encore pour votre accueil.",
+        "type": 1,
+        "createdAt": "2025-12-12 20:15:10"
+      },
+      {
+        "id": 572001526,
+        "subject": "",
+        "message": "Bonjour Johan, nous venons de quitter le logement à l’instant. Merci encore pour ce séjour. L’appartement était juste parfait. Merci pour votre accueil votre disponibilité et votre gentillesse j’espère à très bientôt. Bonne continuation bien cordialement.",
+        "htmlMessage": "Bonjour Johan, nous venons de quitter le logement à l’instant. Merci encore pour ce séjour. L’appartement était juste parfait. Merci pour votre accueil votre disponibilité et votre gentillesse j’espère à très bientôt. Bonne continuation bien cordialement.",
+        "type": 1,
+        "createdAt": "2025-12-14 11:01:28"
+      },
+      {
+        "id": 572095976,
+        "subject": "",
+        "message": "Oui vraiment c’était super merci encore. \n\nUne fois rentré sur Dijon et posé je vous ferai un commentaire à la hauteur de votre bien et votre gentillesse ne vous inquiétez pas. \n\nmerci  encore très belle journée à vous 😊",
+        "htmlMessage": "Oui vraiment c’était super merci encore. \n\nUne fois rentré sur Dijon et posé je vous ferai un commentaire à la hauteur de votre bien et votre gentillesse ne vous inquiétez pas. \n\nmerci  encore très belle journée à vous 😊",
+        "type": 1,
+        "createdAt": "2025-12-14 14:07:16"
+      },
+      {
+        "id": 572118651,
+        "subject": "",
+        "message": "Mon mari les a mis dans le placard à l intérieur du placard où il y a les cintres",
+        "htmlMessage": "Mon mari les a mis dans le placard à l intérieur du placard où il y a les cintres",
+        "type": 1,
+        "createdAt": "2025-12-14 15:01:41"
+      },
+      {
+        "id": 572119306,
+        "subject": "",
+        "message": "vous les avez retrouvé ?",
+        "htmlMessage": "vous les avez retrouvé ?",
+        "type": 1,
+        "createdAt": "2025-12-14 15:02:01"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120573501,
+    "guest_name": "Marie Mougenot",
+    "arrival": "2025-12-17",
+    "departure": "2025-12-19",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 571300346,
+        "subject": "",
+        "message": "Bonjour,\n\nNous avons un événement à venir sur La Tronche. Votre logement est-il bien sur Grenoble, près du centre-ville ?\nLes serviettes de toilette sont-elles fournies ? Et les draps aussi ? Quelle est l'adresse du logement, s'il vous plaît ? Merci pour votre retour. Marie",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-12 20:51:59"
+      },
+      {
+        "id": 571300336,
+        "subject": "",
+        "message": "D'accord, super, merci beaucoup. Nous arriverons tard le mercredi soir car nous venons de Lille, nous avons pas mal de route.\nMerci pour votre réponse, la réservation est bien confirmée ? Marie.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-12 21:23:42"
+      },
+      {
+        "id": 573109221,
+        "subject": "",
+        "message": "Bonjour,\n\nMerci beaucoup pour toutes les informations.\nNous arriverons vers 17h. \nJe vous ferai un petit message une fois arrivée et bien rentrée dans l'appartement.\nUne bonne journée à vous.\nMarie",
+        "htmlMessage": "Bonjour,\n\nMerci beaucoup pour toutes les informations.\nNous arriverons vers 17h. \nJe vous ferai un petit message une fois arrivée et bien rentrée dans l'appartement.\nUne bonne journée à vous.\nMarie",
+        "type": 1,
+        "createdAt": "2025-12-16 14:55:08"
+      },
+      {
+        "id": 573603911,
+        "subject": "",
+        "message": "Bonjour.\nMerci pour les informations. Nous sommes sur la route, nous allons arriver vers 21h. Bon après-midi.",
+        "htmlMessage": "Bonjour.\nMerci pour les informations. Nous sommes sur la route, nous allons arriver vers 21h. Bon après-midi.",
+        "type": 1,
+        "createdAt": "2025-12-17 15:27:04"
+      },
+      {
+        "id": 573785856,
+        "subject": "",
+        "message": "Bien arrivée. C'est super ! Nous sommes bien installés.",
+        "htmlMessage": "Bien arrivée. C'est super ! Nous sommes bien installés.",
+        "type": 1,
+        "createdAt": "2025-12-17 22:29:33"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120007236,
+    "guest_name": "Amal Abed",
+    "arrival": "2025-12-19",
+    "departure": "2025-12-20",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373336,
+        "subject": "",
+        "message": "Rebonjour Johan, je ne sais pas si vous avez reçu mon premier message, je souhaite réserver votre appartement la nuit du 19 décembre, moi et ma famille sommes de passage pour aller au ski à l’alpe d’huez.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-03 11:46:50"
+      },
+      {
+        "id": 568373326,
+        "subject": "",
+        "message": "Merci à vous, avez vous des informations particulières pour l’entrée ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-03 12:42:57"
+      },
+      {
+        "id": 568373316,
+        "subject": "",
+        "message": "Merci bien 😌 ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-03 12:45:21"
+      },
+      {
+        "id": 574506876,
+        "subject": "",
+        "message": "Merci beaucoup 😊 ",
+        "htmlMessage": "Merci beaucoup 😊 ",
+        "type": 1,
+        "createdAt": "2025-12-19 11:26:48"
+      },
+      {
+        "id": 574846081,
+        "subject": "",
+        "message": "Bonsoir Virginie on vient d’arriver à l’adresse, avez vous un parking",
+        "htmlMessage": "Bonsoir Virginie on vient d’arriver à l’adresse, avez vous un parking",
+        "type": 1,
+        "createdAt": "2025-12-19 22:01:44"
+      },
+      {
+        "id": 574848416,
+        "subject": "",
+        "message": "D’accord il n’y a pas de souci nous allons nous garer dans la rue",
+        "htmlMessage": "D’accord il n’y a pas de souci nous allons nous garer dans la rue",
+        "type": 1,
+        "createdAt": "2025-12-19 22:07:22"
+      },
+      {
+        "id": 574852616,
+        "subject": "",
+        "message": "Très bel appartement 🤩merci, les enfants sont ravis, juste si vous avez un code wifi merci de l’envoyer ",
+        "htmlMessage": "Très bel appartement 🤩merci, les enfants sont ravis, juste si vous avez un code wifi merci de l’envoyer ",
+        "type": 1,
+        "createdAt": "2025-12-19 22:20:20"
+      },
+      {
+        "id": 574867561,
+        "subject": "",
+        "message": "Oui le wifi fonctionne merci et bonne soirée ",
+        "htmlMessage": "Oui le wifi fonctionne merci et bonne soirée ",
+        "type": 1,
+        "createdAt": "2025-12-19 23:15:43"
+      },
+      {
+        "id": 575037926,
+        "subject": "",
+        "message": "Bonjour, nous venons de quitter l’appartement, merci encore et bonne continuation ",
+        "htmlMessage": "Bonjour, nous venons de quitter l’appartement, merci encore et bonne continuation ",
+        "type": 1,
+        "createdAt": "2025-12-20 10:35:43"
+      },
+      {
+        "id": 575385996,
+        "subject": "",
+        "message": "Merci ☺️ ",
+        "htmlMessage": "Merci ☺️ ",
+        "type": 1,
+        "createdAt": "2025-12-20 21:25:35"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120491866,
+    "guest_name": "Adélaïde Gacon",
+    "arrival": "2025-12-20",
+    "departure": "2025-12-24",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 570766291,
+        "subject": "",
+        "message": "Bonjour, \nNous venons passez quelques jours en famille à Grenoble ! \nNous arrivons samedis pas trop tard et on repart le 24 tôt le matin ! ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-11 22:48:06"
+      },
+      {
+        "id": 575073171,
+        "subject": "",
+        "message": "Bonjour, \nEst-ce possible d’arriver un peu plus tôt ? Si oui votre heure sera la nôtre. \nMerci ",
+        "htmlMessage": "Bonjour, \nEst-ce possible d’arriver un peu plus tôt ? Si oui votre heure sera la nôtre. \nMerci ",
+        "type": 1,
+        "createdAt": "2025-12-20 11:33:14"
+      },
+      {
+        "id": 575102976,
+        "subject": "",
+        "message": "Super ! Merci !\nJe pense qu’on sera là vers 15h ",
+        "htmlMessage": "Super ! Merci !\nJe pense qu’on sera là vers 15h ",
+        "type": 1,
+        "createdAt": "2025-12-20 12:23:15"
+      },
+      {
+        "id": 575582931,
+        "subject": "",
+        "message": "Tout est parfait ! On a cuisiner notre premier dîner hier soir et c’était nickel ",
+        "htmlMessage": "Tout est parfait ! On a cuisiner notre premier dîner hier soir et c’était nickel ",
+        "type": 1,
+        "createdAt": "2025-12-21 10:30:12"
+      },
+      {
+        "id": 576760256,
+        "subject": "",
+        "message": "Petite frousse mais tout va bien. On sera partis demain avant 11h. \nAucun soucis ! \nBonne journée ",
+        "htmlMessage": "Petite frousse mais tout va bien. On sera partis demain avant 11h. \nAucun soucis ! \nBonne journée ",
+        "type": 1,
+        "createdAt": "2025-12-23 11:38:16"
+      },
+      {
+        "id": 578934216,
+        "subject": "",
+        "message": "Bonjour \nAlors alors vraiment on a passé un super séjour ! On avait pas compris qu’on serait en rdc mais c’est pas grave.\nPour améliorer un peu le séjour je dirais que vous auriez pu augmenter le nombre de chiffons/torchons dans la cuisine. \nIdem pour quelques consommables : papier toilette, produit de lave vaisselle, produit pour nettoyer les wc. \nOn a été impressionnés pas l’équipement de la cuisine, c’était top ! On a même réussi à cuisiner une bûche de Noël ! \nLa qualité des lits et des couettes et oreillers était INCROYABLE ! Le canapé, n’en parlons pas !\nOn a rigolé devant une des affiches de la grande chambre sur laquelle il est écrit « heuri matisse » « papiers gecoupes » c’est chat gpt qui a fait ça ? \nBref ! C’était un séjour 5 étoiles !",
+        "htmlMessage": "Bonjour \nAlors alors vraiment on a passé un super séjour ! On avait pas compris qu’on serait en rdc mais c’est pas grave.\nPour améliorer un peu le séjour je dirais que vous auriez pu augmenter le nombre de chiffons/torchons dans la cuisine. \nIdem pour quelques consommables : papier toilette, produit de lave vaisselle, produit pour nettoyer les wc. \nOn a été impressionnés pas l’équipement de la cuisine, c’était top ! On a même réussi à cuisiner une bûche de Noël ! \nLa qualité des lits et des couettes et oreillers était INCROYABLE ! Le canapé, n’en parlons pas !\nOn a rigolé devant une des affiches de la grande chambre sur laquelle il est écrit « heuri matisse » « papiers gecoupes » c’est chat gpt qui a fait ça ? \nBref ! C’était un séjour 5 étoiles !",
+        "type": 1,
+        "createdAt": "2025-12-27 10:23:55"
+      },
+      {
+        "id": 578938321,
+        "subject": "",
+        "message": "Ha et aussi on a eu l’impression que la vmc de la salle de bain ne marchait pas ",
+        "htmlMessage": "Ha et aussi on a eu l’impression que la vmc de la salle de bain ne marchait pas ",
+        "type": 1,
+        "createdAt": "2025-12-27 10:30:25"
+      },
+      {
+        "id": 578938696,
+        "subject": "",
+        "message": "Oulala on a l’impression qu’on dit que les trucs négatifs mais vraiment c’était un super séjour et on est très content d’avoir choisi votre logement !",
+        "htmlMessage": "Oulala on a l’impression qu’on dit que les trucs négatifs mais vraiment c’était un super séjour et on est très content d’avoir choisi votre logement !",
+        "type": 1,
+        "createdAt": "2025-12-27 10:30:58"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120007241,
+    "guest_name": "Elodie Detoeuf",
+    "arrival": "2025-12-24",
+    "departure": "2025-12-26",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373386,
+        "subject": "",
+        "message": "Bonjour,\nJe souhaite réserver votre appartement pour 2 nuits afin de venir voir ma famille à Grenoble pour les fêtes de Noël.\nMerci à vous \nElodie ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-01 20:56:20"
+      },
+      {
+        "id": 576676241,
+        "subject": "",
+        "message": "Bonjour,\nMerci beaucoup pour ces informations. C’est bien noté.\nBonne journée à vous,\nElodie ",
+        "htmlMessage": "Bonjour,\nMerci beaucoup pour ces informations. C’est bien noté.\nBonne journée à vous,\nElodie ",
+        "type": 1,
+        "createdAt": "2025-12-23 09:27:19"
+      },
+      {
+        "id": 577926471,
+        "subject": "",
+        "message": "Bonjour,\nMerci pour votre message. Oui tout se passe bien, nous nous sentons très bien dans le logement et nous ne manquons de rien ☺️\nÀ quelle heure devons nous quitter le logement demain ?\nMerci encore pour votre accueil.\nElodie ",
+        "htmlMessage": "Bonjour,\nMerci pour votre message. Oui tout se passe bien, nous nous sentons très bien dans le logement et nous ne manquons de rien ☺️\nÀ quelle heure devons nous quitter le logement demain ?\nMerci encore pour votre accueil.\nElodie ",
+        "type": 1,
+        "createdAt": "2025-12-25 16:53:43"
+      },
+      {
+        "id": 578173146,
+        "subject": "",
+        "message": "Cest noté merci à vous.",
+        "htmlMessage": "Cest noté merci à vous.",
+        "type": 1,
+        "createdAt": "2025-12-26 08:01:35"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120007246,
+    "guest_name": "Olivier Ledain",
+    "arrival": "2025-12-26",
+    "departure": "2025-12-27",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373401,
+        "subject": "",
+        "message": "Bonjour, nous sommes de passage à Grenoble en direction du sud. Nous aimerions passer la soirée et la nuit dans votre appartement.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-02 21:15:45"
+      },
+      {
+        "id": 578919966,
+        "subject": "",
+        "message": "Bonjour,\nNous avons quitté ce matin votre logement, très sympa, confortable et bien équipé... Un grand merci à vous pour votre accueil.\nOlivier et Sandrine ",
+        "htmlMessage": "Bonjour,\nNous avons quitté ce matin votre logement, très sympa, confortable et bien équipé... Un grand merci à vous pour votre accueil.\nOlivier et Sandrine ",
+        "type": 1,
+        "createdAt": "2025-12-27 10:07:41"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120007251,
+    "guest_name": "Andreas Grote",
+    "arrival": "2025-12-27",
+    "departure": "2026-01-02",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 568373346,
+        "subject": "",
+        "message": "Hallo Johan, wir möchten gerne Grenoble besuchen - wir sind eine 4-köpfige Familie aus Frankfurt- viele Grüße Andreas ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-03 23:23:30"
+      },
+      {
+        "id": 578569271,
+        "subject": "",
+        "message": "Merci ...",
+        "htmlMessage": "Merci ...",
+        "type": 1,
+        "createdAt": "2025-12-26 17:54:16"
+      },
+      {
+        "id": 578914531,
+        "subject": "",
+        "message": "Hi Virginie & Johan - I just want to inform you that due to some personal reasons we will be only able to arrive in Grenoble on Sunday .. I hope this is not a problem - thank you - Andreas",
+        "htmlMessage": "Hi Virginie & Johan - I just want to inform you that due to some personal reasons we will be only able to arrive in Grenoble on Sunday .. I hope this is not a problem - thank you - Andreas",
+        "type": 1,
+        "createdAt": "2025-12-27 10:04:19"
+      },
+      {
+        "id": 578954806,
+        "subject": "",
+        "message": "Alles klar - vielen Dank ... wir melden uns, wenn wir morgen auf dem Weg sind ... sorry für die Unannehmlichkeiten.. viele grüße ... Andreas",
+        "htmlMessage": "Alles klar - vielen Dank ... wir melden uns, wenn wir morgen auf dem Weg sind ... sorry für die Unannehmlichkeiten.. viele grüße ... Andreas",
+        "type": 1,
+        "createdAt": "2025-12-27 10:56:02"
+      },
+      {
+        "id": 579565736,
+        "subject": "",
+        "message": "Merci ... we are on the way to Grenoble ... ",
+        "htmlMessage": "Merci ... we are on the way to Grenoble ... ",
+        "type": 1,
+        "createdAt": "2025-12-28 09:38:48"
+      },
+      {
+        "id": 579926966,
+        "subject": "",
+        "message": "Hi Johan - wir sind gerade angekommen ... wow ... selten eine so schöne airbnb wohnung gehabt... vielen Dank ... ",
+        "htmlMessage": "Hi Johan - wir sind gerade angekommen ... wow ... selten eine so schöne airbnb wohnung gehabt... vielen Dank ... ",
+        "type": 1,
+        "createdAt": "2025-12-28 18:10:56"
+      }
+    ]
+  },
+  {
+    "reservation_id": 121135736,
+    "guest_name": "Tami Crabtree",
+    "arrival": "2026-01-02",
+    "departure": "2026-01-08",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 574302236,
+        "subject": "",
+        "message": "Hi Johan, we are making a late change in destination for our winter travel plans due to some increased travel advisories for our original destination. Traveling with my daughter and her boyfriend and will be our first time visiting the area. Really excited. Thanks ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-18 23:12:14"
+      },
+      {
+        "id": 577560911,
+        "subject": "",
+        "message": "Hi, hope you are well.  Any chance your place is available earlier? Like for check-in on the 31st? Thanks!!",
+        "htmlMessage": "Hi, hope you are well.  Any chance your place is available earlier? Like for check-in on the 31st? Thanks!!",
+        "type": 1,
+        "createdAt": "2025-12-24 20:54:49"
+      },
+      {
+        "id": 582338311,
+        "subject": "",
+        "message": "Hi, thanks for the info. Would early check in be an option? Thanks. Happy New Year. ",
+        "htmlMessage": "Hi, thanks for the info. Would early check in be an option? Thanks. Happy New Year. ",
+        "type": 1,
+        "createdAt": "2026-01-01 14:30:56"
+      },
+      {
+        "id": 582464631,
+        "subject": "",
+        "message": "Hi, we check out of our current place in Grenoble at noon. Could we arrange for early luggage drop off?  Thanks!!",
+        "htmlMessage": "Hi, we check out of our current place in Grenoble at noon. Could we arrange for early luggage drop off?  Thanks!!",
+        "type": 1,
+        "createdAt": "2026-01-01 17:57:47"
+      },
+      {
+        "id": 582583381,
+        "subject": "",
+        "message": "Thanks!",
+        "htmlMessage": "Thanks!",
+        "type": 1,
+        "createdAt": "2026-01-01 21:09:38"
+      },
+      {
+        "id": 584499911,
+        "subject": "",
+        "message": "Thanks! The accommodation is great. Just a couple of things\n1) the water in the shower seems to be ending up all over the floor.  Perhaps we are not doing something right or it is not draining quickly enough? \n2) we could use a little more salt and a couple of laundry detergents, is that something we need to purchase ourselves? Thanks!\nTami",
+        "htmlMessage": "Thanks! The accommodation is great. Just a couple of things\n1) the water in the shower seems to be ending up all over the floor.  Perhaps we are not doing something right or it is not draining quickly enough? \n2) we could use a little more salt and a couple of laundry detergents, is that something we need to purchase ourselves? Thanks!\nTami",
+        "type": 1,
+        "createdAt": "2026-01-05 07:28:45"
+      },
+      {
+        "id": 584503871,
+        "subject": "",
+        "message": "Sure. Thanks!",
+        "htmlMessage": "Sure. Thanks!",
+        "type": 1,
+        "createdAt": "2026-01-05 07:56:18"
+      },
+      {
+        "id": 584865796,
+        "subject": "",
+        "message": "Yes, I’m just napping. Please come on in. Thx. ",
+        "htmlMessage": "Yes, I’m just napping. Please come on in. Thx. ",
+        "type": 1,
+        "createdAt": "2026-01-05 18:43:08"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123068726,
+    "guest_name": "Clara El Ferra",
+    "arrival": "2026-01-09",
+    "departure": "2026-01-12",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 586050546,
+        "subject": "",
+        "message": "Bonjour, nous venons entre amis pour visiter!",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-08 00:15:19"
+      },
+      {
+        "id": 586342571,
+        "subject": "",
+        "message": "Bonsoir, merci beaucoup pour toutes ces informations !\nNon, nous n’allons pas faire de ski, donc aucun souci.\nNous arriverons aux alentours de 14h, est-ce qu’il serait possible d’y aller directement ?\nAvec ce froid, c’est assez compliqué d’attendre longtemps dehors 😅",
+        "htmlMessage": "Bonsoir, merci beaucoup pour toutes ces informations !\nNon, nous n’allons pas faire de ski, donc aucun souci.\nNous arriverons aux alentours de 14h, est-ce qu’il serait possible d’y aller directement ?\nAvec ce froid, c’est assez compliqué d’attendre longtemps dehors 😅",
+        "type": 1,
+        "createdAt": "2026-01-08 18:14:17"
+      },
+      {
+        "id": 586417471,
+        "subject": "",
+        "message": "Pas de soucis ! Merci beaucoup :)",
+        "htmlMessage": "Pas de soucis ! Merci beaucoup :)",
+        "type": 1,
+        "createdAt": "2026-01-08 20:59:11"
+      },
+      {
+        "id": 587342061,
+        "subject": "",
+        "message": "Bonsoir Johan,\n\nMerci beaucoup pour votre message.\n\nTout se passe très bien dans le logement, il est vraiment agréable.\n\nJuste pour vous signaler deux petites choses : je ne sais pas si c’est normal, mais la machine à laver bouge beaucoup lorsqu’elle est en fonctionnement.\nEt aussi, le premier jour de mon arrivée, en voulant fermer les rideaux, la barre est tombée sur ma tête 😅\n\nÀ part ça, tout est parfait. Merci encore pour votre disponibilité.\n\nBonne soirée,\nClara!\n\n",
+        "htmlMessage": "Bonsoir Johan,\n\nMerci beaucoup pour votre message.\n\nTout se passe très bien dans le logement, il est vraiment agréable.\n\nJuste pour vous signaler deux petites choses : je ne sais pas si c’est normal, mais la machine à laver bouge beaucoup lorsqu’elle est en fonctionnement.\nEt aussi, le premier jour de mon arrivée, en voulant fermer les rideaux, la barre est tombée sur ma tête 😅\n\nÀ part ça, tout est parfait. Merci encore pour votre disponibilité.\n\nBonne soirée,\nClara!\n\n",
+        "type": 1,
+        "createdAt": "2026-01-10 17:33:37"
+      },
+      {
+        "id": 587441126,
+        "subject": "",
+        "message": "non pas de soucis ça peut attendre merci beaucoup. C’était simplement pour vous tenir informé ",
+        "htmlMessage": "non pas de soucis ça peut attendre merci beaucoup. C’était simplement pour vous tenir informé ",
+        "type": 1,
+        "createdAt": "2026-01-10 20:43:34"
+      },
+      {
+        "id": 587454996,
+        "subject": "",
+        "message": "De plus, \n\nNous voulions savoir s’il serait éventuellement possible de partir un peu plus tard demain.\nNous avons un train assez tard, vers 20h, donc si jamais une flexibilité est possible, ce serait vraiment super !\n\nMerci de votre compréhension \nBonne soirée \nClara ",
+        "htmlMessage": "De plus, \n\nNous voulions savoir s’il serait éventuellement possible de partir un peu plus tard demain.\nNous avons un train assez tard, vers 20h, donc si jamais une flexibilité est possible, ce serait vraiment super !\n\nMerci de votre compréhension \nBonne soirée \nClara ",
+        "type": 1,
+        "createdAt": "2026-01-10 21:09:18"
+      },
+      {
+        "id": 587507891,
+        "subject": "",
+        "message": "pas de soucis je vais prendre une nuit de plus, comment peut-on faire ? ",
+        "htmlMessage": "pas de soucis je vais prendre une nuit de plus, comment peut-on faire ? ",
+        "type": 1,
+        "createdAt": "2026-01-11 00:07:32"
+      },
+      {
+        "id": 587511021,
+        "subject": "",
+        "message": "super merci beaucoup ! bonne soirée ",
+        "htmlMessage": "super merci beaucoup ! bonne soirée ",
+        "type": 1,
+        "createdAt": "2026-01-11 00:28:31"
+      },
+      {
+        "id": 587910906,
+        "subject": "",
+        "message": "Bonsoir Johan,\n\nC’est bon, nous sommes partis.\nMerci beaucoup pour ce cocon, on a vraiment adoré notre week-end.\n\nNous avons laissé les dernières vaisselles dans le lave-vaisselle car il était encore en train de tourner, et les serviettes dans la machine à laver.\n\nMerci encore et très bonne soirée !\nClara",
+        "htmlMessage": "Bonsoir Johan,\n\nC’est bon, nous sommes partis.\nMerci beaucoup pour ce cocon, on a vraiment adoré notre week-end.\n\nNous avons laissé les dernières vaisselles dans le lave-vaisselle car il était encore en train de tourner, et les serviettes dans la machine à laver.\n\nMerci encore et très bonne soirée !\nClara",
+        "type": 1,
+        "createdAt": "2026-01-11 19:48:34"
+      },
+      {
+        "id": 589367011,
+        "subject": "",
+        "message": "Bonsoir,\nPour notre part, tout s’est vraiment très bien passé. Nous nous sommes sentis très bien dans l’appartement, qui est très bien équipé et agréable à vivre.\n\nJuste deux petits points à noter : la machine à laver qui bouge beaucoup et vu le poid très compliqué à déplacer, et le fait que l’appartement était vraiment très froid à notre arrivée, il nous a fallu pas mal de temps pour nous réchauffer !\n\nMais à part ça, tout était parfait. C’est un vrai petit cocon. Merci encore pour l’accueil !! \nClara ",
+        "htmlMessage": "Bonsoir,\nPour notre part, tout s’est vraiment très bien passé. Nous nous sommes sentis très bien dans l’appartement, qui est très bien équipé et agréable à vivre.\n\nJuste deux petits points à noter : la machine à laver qui bouge beaucoup et vu le poid très compliqué à déplacer, et le fait que l’appartement était vraiment très froid à notre arrivée, il nous a fallu pas mal de temps pour nous réchauffer !\n\nMais à part ça, tout était parfait. C’est un vrai petit cocon. Merci encore pour l’accueil !! \nClara ",
+        "type": 1,
+        "createdAt": "2026-01-14 17:23:06"
+      },
+      {
+        "id": 589539071,
+        "subject": "",
+        "message": "Concernant les meubles, nous sommes vraiment désolées. Ma copine aime dormir collé au mur , donc elle a déplacé le lit, et on a complètement oublié de le remettre à sa place avant de partir.\n\nPour les poubelles, on en a jeté plusieurs on en avait beaucoup et on a malheureusement oublié celle qui était sous l’évier, ce n’était absolument pas volontaire… Pareil pour les sacs, on a complètement oublié!\n\nOn avait beaucoup de choses à gérer et on est partis rapidement, mais encore une fois, désolées pour la gêne occasionnée, nous avons tout de même tout rangé en globalité et nettoyé le plus grand .\n\nMerci pour votre compréhension,\nClara",
+        "htmlMessage": "Concernant les meubles, nous sommes vraiment désolées. Ma copine aime dormir collé au mur , donc elle a déplacé le lit, et on a complètement oublié de le remettre à sa place avant de partir.\n\nPour les poubelles, on en a jeté plusieurs on en avait beaucoup et on a malheureusement oublié celle qui était sous l’évier, ce n’était absolument pas volontaire… Pareil pour les sacs, on a complètement oublié!\n\nOn avait beaucoup de choses à gérer et on est partis rapidement, mais encore une fois, désolées pour la gêne occasionnée, nous avons tout de même tout rangé en globalité et nettoyé le plus grand .\n\nMerci pour votre compréhension,\nClara",
+        "type": 1,
+        "createdAt": "2026-01-15 01:24:11"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123769181,
+    "guest_name": "Marina Servidei",
+    "arrival": "2026-01-14",
+    "departure": "2026-01-15",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 588824706,
+        "subject": "",
+        "message": "Bonjour, nous sommes des architectes du même cabinet basé à Avignon, on vient pour assister à une conférence à l’école d’architecture. Votre logement est parfaitement situé et ça nous convient très bien, merci d’avance. Marina",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-13 15:28:24"
+      },
+      {
+        "id": 588858576,
+        "subject": "",
+        "message": "Perfetto, grazie mille ",
+        "htmlMessage": "Perfetto, grazie mille ",
+        "type": 1,
+        "createdAt": "2026-01-13 17:02:58"
+      },
+      {
+        "id": 589538771,
+        "subject": "",
+        "message": "Ça a marché on est dedans",
+        "htmlMessage": "Ça a marché on est dedans",
+        "type": 1,
+        "createdAt": "2026-01-15 01:21:15"
+      },
+      {
+        "id": 589585716,
+        "subject": "",
+        "message": "Bonjour, nous avons quitté l’appartement, en claquant la porte derrière nous. Très confortable, merci ",
+        "htmlMessage": "Bonjour, nous avons quitté l’appartement, en claquant la porte derrière nous. Très confortable, merci ",
+        "type": 1,
+        "createdAt": "2026-01-15 07:28:13"
+      },
+      {
+        "id": 589587816,
+        "subject": "",
+        "message": "Buona giornata ",
+        "htmlMessage": "Buona giornata ",
+        "type": 1,
+        "createdAt": "2026-01-15 07:39:37"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120947421,
+    "guest_name": "Adrien Bodolec",
+    "arrival": "2026-01-15",
+    "departure": "2026-01-18",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 573303316,
+        "subject": "",
+        "message": "Bonjour.\nJe souhaite avoir des informations complémentaires. Est-il possible d'arriver 16h au lieu de 17h? Je voudrais également savoir si les draps et serviettes de bains sont fournis.\nMerci d'avance. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-16 22:25:24"
+      },
+      {
+        "id": 573303306,
+        "subject": "",
+        "message": "Merci pour votre retour. Je voudrais également savoir si les draps et serviettes de bains sont fournis.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-16 22:35:05"
+      },
+      {
+        "id": 573303296,
+        "subject": "",
+        "message": "Nous voyageons avec ma fille de 2 ans. On auront donc besoin du lit bébé. Merci",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-16 22:37:34"
+      },
+      {
+        "id": 573303286,
+        "subject": "",
+        "message": "Ce ne sera pas un problème. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-16 22:45:51"
+      },
+      {
+        "id": 589476766,
+        "subject": "",
+        "message": "Bonsoir. Nous arriverons un peu plus tôt (vers 16h). L'appartement sera-t-il accessible avec les codes d'accès ? ",
+        "htmlMessage": "Bonsoir. Nous arriverons un peu plus tôt (vers 16h). L'appartement sera-t-il accessible avec les codes d'accès ? ",
+        "type": 1,
+        "createdAt": "2026-01-14 21:22:06"
+      },
+      {
+        "id": 589841626,
+        "subject": "",
+        "message": "Bonjour. Nous sommes bien arrivé dans l'appartement. ",
+        "htmlMessage": "Bonjour. Nous sommes bien arrivé dans l'appartement. ",
+        "type": 1,
+        "createdAt": "2026-01-15 16:16:01"
+      },
+      {
+        "id": 589845021,
+        "subject": "",
+        "message": "Merci pour l'information. ",
+        "htmlMessage": "Merci pour l'information. ",
+        "type": 1,
+        "createdAt": "2026-01-15 16:24:43"
+      },
+      {
+        "id": 590190786,
+        "subject": "",
+        "message": "Bonjour. Merci pour l'attention. La poignée de la fenêtre est bien retirée mais la fenêtre n'est pas fermée et s'ouvre toute seule. J'ai donc fermé les volets pour éviter un risque d'intrusion ou de perte de chaleur. Par ailleurs, la lunette des toilettes est mal fixée et bouge. \nMais rien d'urgent. \n",
+        "htmlMessage": "Bonjour. Merci pour l'attention. La poignée de la fenêtre est bien retirée mais la fenêtre n'est pas fermée et s'ouvre toute seule. J'ai donc fermé les volets pour éviter un risque d'intrusion ou de perte de chaleur. Par ailleurs, la lunette des toilettes est mal fixée et bouge. \nMais rien d'urgent. \n",
+        "type": 1,
+        "createdAt": "2026-01-16 10:15:20"
+      },
+      {
+        "id": 590201961,
+        "subject": "",
+        "message": "Vous pouvez le faire intervenir quand vous voulez. Nous serons absent cet après midi normalement et demain une bonne partie de la journée. ",
+        "htmlMessage": "Vous pouvez le faire intervenir quand vous voulez. Nous serons absent cet après midi normalement et demain une bonne partie de la journée. ",
+        "type": 1,
+        "createdAt": "2026-01-16 10:37:15"
+      }
+    ]
+  },
+  {
+    "reservation_id": 120552661,
+    "guest_name": "Erac Emilie",
+    "arrival": "2026-01-19",
+    "departure": "2026-01-24",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 571165876,
+        "subject": "",
+        "message": "Bonjour,\nje me présente, je m'appelle Emilie Guglielmo et je travaille au poste d'attachée de production dans un établissement national d'enseignement supérieur d'art dramatique qui s'appelle l'ERACM.\nNous avons un atelier de formation en résidence à la MC2 de Grenoble qui se déroulera du 20 au 24 janvier 2026 inclus. Je recherche un hébergement doté de 3 chambres afin de loger la metteuse en scène, l'assistant metteur en scène et l'assistante dramaturgique qui vont travailler sur cet atelier de formation.\nVotre appartement me semble proche de la MC2 et accessible en transport en commun. Je ne connais pas du tout Grenoble, pouvez-vous me confirmer la proximité SVP et me confirmer également la disponibilité de l'appartement ? \nJ'aurai voulu connaitre sa localisation afin de visualiser sur google maps l'emplacement et estimer le temps de trajet en venant de la gare SNCF, le temps de trajet pour se rendre à la MC2 et également visualiser les commerces de proximité dans le quartier. \nLes personnes qui occuperaient le logement seraient à pied, il est donc important qu'elle puisse se déplacer facilement en transport en commun et à pied.\nje vous remercie d'avance pour ces renseignements et je vous souhaite une bonne fin de journée.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-10 17:02:34"
+      },
+      {
+        "id": 571165856,
+        "subject": "",
+        "message": "Merci de votre réponse. Pouvez vous m'indiquer le temps de trajet à pied pour se rendre de l'appartement à la MC2 svp ?\nJe propose votre appartement à l'équipe et je souhaitera leur communiquer cette information.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-11 09:39:08"
+      },
+      {
+        "id": 571165846,
+        "subject": "",
+        "message": "merci",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-11 09:41:55"
+      },
+      {
+        "id": 573162861,
+        "subject": "",
+        "message": "Bonjour, \nje suis entrain de préparer un message regroupant les informations relatives à votre logement. Pouvez-vous m'indiquer à quel moment nous seront envoyé les informations relatives à l'arrivée autonome des personnes qui vont loger à l'appartement ?\nest-ce qu'il y a la possibilité de leur envoyer directement par email ces informations ?\nvoici déjà les informations  que j'ai préparé pour la transmission, n'hésitez pas à compléter si besoin.\n\n\nType de logement : Appartement Airbnb T4\r\n\r\nPropriétaire : Johan Martinsson - 06 19 44 14 71\r\nAdresse :\r\n28 rue Émile Zola, 38000 Grenoble \r\nRez-de-chaussée\r\nSéjour du 19 au 24 janvier inclus :\r\n•\tArrivée : lundi 19 janvier 2026 (à partir de 17h00)\r\n•\tDépart : dimanche 25 janvier 2026 (avant 11h00)\r\n\r\nAppartement 4 pièces disposant de trois chambres, chacune équipée d’un coin bureau et d’un couchage double.\r\n\r\nWi-Fi très haut débit à disposition.\r\nEntrée autonome via une serrure connectée.\r\nLes instructions pour entrer dans le logement sont vous seront envoyées 24 heures avant l'arrivée.\r\n\r\nCuisine & équipements\r\n\tLave-vaisselle\r\n\tFour\r\n\tVaisselle et ustensiles complets\r\n\tQuelques condiments à disposition\r\nCafé\r\n\tMachine à espresso à grains\r\n\tCafé fourni (environ 10 cafés)\r\n\tAucune capsule nécessaire\r\nBuanderie\r\n\tMachine à laver combinée sèche-linge\r\n\r\nAccès & mobilité\r\n\tAppartement de plain-pied (une marche à l’entrée)\r\n\tArrivée autonome, même tardive, via serrure connectée\r\n\tTram à 250 m\r\n\tStation de vélos devant l’immeuble\r\n\r\nRèglement intérieur\r\nMerci de respecter les règles suivantes :\r\n\tCapacité maximale : 6 personnes\r\n\tLogement non-fumeur\r\n\tAnimaux non autorisés\r\n\tFêtes et soirées interdites\r\n\tPhotographie commerciale autorisée\r\n\r\nL’immeuble est résidentiel, merci de limiter les nuisances sonores à toute heure et d’y être particulièrement attentif entre de 22h00 à 07h00.\r\n\r\nConsignes de départ\r\n\tAvant votre départ, merci de :\r\n\tRassembler les serviettes utilisées\r\n\tJeter les ordures (local situé dans l’arrière-cour)\r\n\tFermer les fenêtres et les volets",
+        "htmlMessage": "Bonjour, \nje suis entrain de préparer un message regroupant les informations relatives à votre logement. Pouvez-vous m'indiquer à quel moment nous seront envoyé les informations relatives à l'arrivée autonome des personnes qui vont loger à l'appartement ?\nest-ce qu'il y a la possibilité de leur envoyer directement par email ces informations ?\nvoici déjà les informations  que j'ai préparé pour la transmission, n'hésitez pas à compléter si besoin.\n\n\nType de logement : Appartement Airbnb T4\r\n\r\nPropriétaire : Johan Martinsson - 06 19 44 14 71\r\nAdresse :\r\n28 rue Émile Zola, 38000 Grenoble \r\nRez-de-chaussée\r\nSéjour du 19 au 24 janvier inclus :\r\n•\tArrivée : lundi 19 janvier 2026 (à partir de 17h00)\r\n•\tDépart : dimanche 25 janvier 2026 (avant 11h00)\r\n\r\nAppartement 4 pièces disposant de trois chambres, chacune équipée d’un coin bureau et d’un couchage double.\r\n\r\nWi-Fi très haut débit à disposition.\r\nEntrée autonome via une serrure connectée.\r\nLes instructions pour entrer dans le logement sont vous seront envoyées 24 heures avant l'arrivée.\r\n\r\nCuisine & équipements\r\n\tLave-vaisselle\r\n\tFour\r\n\tVaisselle et ustensiles complets\r\n\tQuelques condiments à disposition\r\nCafé\r\n\tMachine à espresso à grains\r\n\tCafé fourni (environ 10 cafés)\r\n\tAucune capsule nécessaire\r\nBuanderie\r\n\tMachine à laver combinée sèche-linge\r\n\r\nAccès & mobilité\r\n\tAppartement de plain-pied (une marche à l’entrée)\r\n\tArrivée autonome, même tardive, via serrure connectée\r\n\tTram à 250 m\r\n\tStation de vélos devant l’immeuble\r\n\r\nRèglement intérieur\r\nMerci de respecter les règles suivantes :\r\n\tCapacité maximale : 6 personnes\r\n\tLogement non-fumeur\r\n\tAnimaux non autorisés\r\n\tFêtes et soirées interdites\r\n\tPhotographie commerciale autorisée\r\n\r\nL’immeuble est résidentiel, merci de limiter les nuisances sonores à toute heure et d’y être particulièrement attentif entre de 22h00 à 07h00.\r\n\r\nConsignes de départ\r\n\tAvant votre départ, merci de :\r\n\tRassembler les serviettes utilisées\r\n\tJeter les ordures (local situé dans l’arrière-cour)\r\n\tFermer les fenêtres et les volets",
+        "type": 1,
+        "createdAt": "2025-12-16 16:56:27"
+      },
+      {
+        "id": 574096231,
+        "subject": "",
+        "message": "Je vous remercie de cette précision. Je veux bien que vous envoyiez, en temps et en heure, les informations aux personnes qui occuperont le logement. \n\nVoici leur coordonnées :\nEmilie Anna Maillet,  06 62 17 11 45\t- emilieanna.m@gmail.com\nTom Lejars,  07 86 75 42 36 - tomlejars@gmail.com\nLoleh Ferraud,  06 95 20 98 01\tloleh.feraud@gmail.com",
+        "htmlMessage": "Je vous remercie de cette précision. Je veux bien que vous envoyiez, en temps et en heure, les informations aux personnes qui occuperont le logement. \n\nVoici leur coordonnées :\nEmilie Anna Maillet,  06 62 17 11 45\t- emilieanna.m@gmail.com\nTom Lejars,  07 86 75 42 36 - tomlejars@gmail.com\nLoleh Ferraud,  06 95 20 98 01\tloleh.feraud@gmail.com",
+        "type": 1,
+        "createdAt": "2025-12-18 15:28:27"
+      },
+      {
+        "id": 586782961,
+        "subject": "",
+        "message": "Bonjour, \nMerci d'avoir accepté de modifier la réservation. En effet, les trois personnes qui logeront dans votre appartement vont finalement terminer de travailler suffisamment tot pour pouvoir rentrer à leurs domiciles respectifs le 24/01 au soir",
+        "htmlMessage": "Bonjour, \nMerci d'avoir accepté de modifier la réservation. En effet, les trois personnes qui logeront dans votre appartement vont finalement terminer de travailler suffisamment tot pour pouvoir rentrer à leurs domiciles respectifs le 24/01 au soir",
+        "type": 1,
+        "createdAt": "2026-01-09 15:36:57"
+      },
+      {
+        "id": 592180046,
+        "subject": "Re: 19.01.26 - 24.01.26, Le Matisse",
+        "message": "Bonsoir,\n\nOui nous sommes rentrés (j’allais vous envoyer un message)\nMais quand nous sommes arrivés la porte entre-ouverte…\nIl me semble pas qu’il manque quoi que ce soit, on a supposé peut être que\nla personne qui s’occupe de l’entretien n’avait pas bien refermé ?\n\nLe lun. 19 janv. 2026 à 21:42, <martinsson.johan@host.smoobu.com> a écrit :\n\n> Bonsoir,\n>\n> Je voulais juste m'assurer que vous avez pu entrer dans l'appartement avec\n> le code (945612266) et que tout se passe bien\n>\n> Cordialement\n>\n\n",
+        "htmlMessage": "<div dir=\"auto\">Bonsoir,</div><div dir=\"auto\"><br></div><div dir=\"auto\">Oui nous sommes rentrés (j’allais vous envoyer un message)</div><div dir=\"auto\">Mais quand nous sommes arrivés la porte entre-ouverte…</div><div dir=\"auto\">Il me semble pas qu’il manque quoi que ce soit, on a supposé peut être que la personne qui s’occupe de l’entretien n’avait pas bien refermé ?</div><div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">Le lun. 19 janv. 2026 à 21:42, &lt;<a href=\"mailto:martinsson.johan@host.smoobu.com\">martinsson.johan@host.smoobu.com</a>&gt; a écrit :<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left-width:1px;border-left-style:solid;padding-left:1ex;border-left-color:rgb(204,204,204)\">\n<u></u>\n\n\n  \n    \n    \n  \n  <div>\n    <p>\n      Bonsoir, <br>\n<br>\nJe voulais juste m&#39;assurer que vous avez pu entrer dans l&#39;appartement avec le code (945612266) et que tout se passe bien<br>\n<br>\nCordialement    </p>\n  </div>\n\n</blockquote></div></div>\n\n",
+        "type": 1,
+        "createdAt": "2026-01-19 22:15:09"
+      },
+      {
+        "id": 592186001,
+        "subject": "Re: 19.01.26 - 24.01.26, Le Matisse",
+        "message": "Oui c'est parfait, merci\n\nCordialement\n\nLe lun. 19 janv. 2026 à 21:43, <martinsson.johan@host.smoobu.com> a écrit :\n\n> Bonsoir,\n>\n> Je voulais juste m'assurer que vous avez pu entrer dans l'appartement avec\n> le code (945612266) et que tout se passe bien\n>\n> Cordialement\n>\n\n",
+        "htmlMessage": "<div dir=\"ltr\">Oui c&#39;est parfait, merci<div><br></div><div>Cordialement</div></div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">Le lun. 19 janv. 2026 à 21:43, &lt;<a href=\"mailto:martinsson.johan@host.smoobu.com\">martinsson.johan@host.smoobu.com</a>&gt; a écrit :<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\">\n<u></u>\n\n\n  \n    \n    \n  \n  <div>\n    <p>\n      Bonsoir,<br>\n<br>\nJe voulais juste m&#39;assurer que vous avez pu entrer dans l&#39;appartement avec le code (945612266) et que tout se passe bien<br>\n<br>\nCordialement    </p>\n  </div>\n\n</blockquote></div>\n\n",
+        "type": 1,
+        "createdAt": "2026-01-19 22:29:49"
+      }
+    ]
+  },
+  {
+    "reservation_id": 124864291,
+    "guest_name": "Amel Ghadbane",
+    "arrival": "2026-01-24",
+    "departure": "2026-01-25",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 593174616,
+        "subject": "",
+        "message": "Bonjour, \nnous venons sur Grenoble  avec mon mari et ma fille pour un tournoi de tennis. ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-21 21:13:37"
+      },
+      {
+        "id": 593177091,
+        "subject": "",
+        "message": "Bonsoir,\n\nC’est parfait merci. Je ne pense pas que nous aurons besoin d’une arrivée plus tôt, les matchs prennent souvent beaucoup de temps … \nMais nous prenons note. \n\nMerci et bonne soirée ",
+        "htmlMessage": "Bonsoir,\n\nC’est parfait merci. Je ne pense pas que nous aurons besoin d’une arrivée plus tôt, les matchs prennent souvent beaucoup de temps … \nMais nous prenons note. \n\nMerci et bonne soirée ",
+        "type": 1,
+        "createdAt": "2026-01-21 21:43:14"
+      },
+      {
+        "id": 593177896,
+        "subject": "",
+        "message": "🤞🏼🤞🏼🤞🏼🤞🏼",
+        "htmlMessage": "🤞🏼🤞🏼🤞🏼🤞🏼",
+        "type": 1,
+        "createdAt": "2026-01-21 21:45:14"
+      },
+      {
+        "id": 593900331,
+        "subject": "",
+        "message": "Bonjour, \ntrès bien merci \nBonne journée. \n\nAmel\n",
+        "htmlMessage": "Bonjour, \ntrès bien merci \nBonne journée. \n\nAmel\n",
+        "type": 1,
+        "createdAt": "2026-01-23 10:12:21"
+      },
+      {
+        "id": 594975311,
+        "subject": "",
+        "message": "Bonjour, nous avons quitté le logement. Tout était parfait et agréable. Nous avons eu juste un petit soucis sur l’évacuation d’eau dans la douche, qui se fait difficilement quand le jet est un peu fort. \nEt la bonde de l’évier de la salle de bain se coince. Du coup je l’ai retiré pour éviter de boucher l’évier. \n",
+        "htmlMessage": "Bonjour, nous avons quitté le logement. Tout était parfait et agréable. Nous avons eu juste un petit soucis sur l’évacuation d’eau dans la douche, qui se fait difficilement quand le jet est un peu fort. \nEt la bonde de l’évier de la salle de bain se coince. Du coup je l’ai retiré pour éviter de boucher l’évier. \n",
+        "type": 1,
+        "createdAt": "2026-01-25 10:03:38"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123112271,
+    "guest_name": "Swanny Medard",
+    "arrival": "2026-01-25",
+    "departure": "2026-01-27",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 586233266,
+        "subject": "",
+        "message": "Bonjour , \nNous sommes 4 personnes en déplacement professionnel pour sport achat à Grenoble ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-08 14:36:47"
+      }
+    ]
+  },
+  {
+    "reservation_id": 121730956,
+    "guest_name": "Garry Fauche",
+    "arrival": "2026-01-27",
+    "departure": "2026-01-28",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 578597646,
+        "subject": "",
+        "message": "Bonjour, nous sommes 3 voyageurs pour 1 nuit uniquement. Nous venons de Val d'Isère pour la salon Sport Achat à Alpexpo. Garry.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2025-12-26 18:04:58"
+      },
+      {
+        "id": 596299921,
+        "subject": "",
+        "message": "Hi Johan. Thanks for the infos. We’ll arrive late around 9pm 🙂 Garry",
+        "htmlMessage": "Hi Johan. Thanks for the infos. We’ll arrive late around 9pm 🙂 Garry",
+        "type": 1,
+        "createdAt": "2026-01-27 16:21:02"
+      }
+    ]
+  },
+  {
+    "reservation_id": 125738476,
+    "guest_name": "⁨George (Gill’s Son)⁩ Hart",
+    "arrival": "2026-01-28",
+    "departure": "2026-01-31",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 596731711,
+        "subject": "",
+        "message": "Hi. We are arriving today please as our accommodation has let us down! Please can we have a cot for the baby?\n\nAlso is there parking nearby? ",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-28 13:39:43"
+      },
+      {
+        "id": 596737951,
+        "subject": "",
+        "message": "Is it a travel cot?",
+        "htmlMessage": "Is it a travel cot?",
+        "type": 1,
+        "createdAt": "2026-01-28 13:54:19"
+      },
+      {
+        "id": 596738376,
+        "subject": "",
+        "message": "Thanks ",
+        "htmlMessage": "Thanks ",
+        "type": 1,
+        "createdAt": "2026-01-28 13:55:14"
+      },
+      {
+        "id": 596738416,
+        "subject": "",
+        "message": "Appreciate your speed",
+        "htmlMessage": "Appreciate your speed",
+        "type": 1,
+        "createdAt": "2026-01-28 13:55:27"
+      },
+      {
+        "id": 596787091,
+        "subject": "",
+        "message": "Hi guys. We are here early. Are we able to go in ahead of time please? ",
+        "htmlMessage": "Hi guys. We are here early. Are we able to go in ahead of time please? ",
+        "type": 1,
+        "createdAt": "2026-01-28 15:32:34"
+      },
+      {
+        "id": 596787296,
+        "subject": "",
+        "message": "Sorry, I meant to ask earlier, but today has been a bad one ",
+        "htmlMessage": "Sorry, I meant to ask earlier, but today has been a bad one ",
+        "type": 1,
+        "createdAt": "2026-01-28 15:32:52"
+      },
+      {
+        "id": 596788231,
+        "subject": "",
+        "message": "Thank you?",
+        "htmlMessage": "Thank you?",
+        "type": 1,
+        "createdAt": "2026-01-28 15:35:45"
+      },
+      {
+        "id": 596788241,
+        "subject": "",
+        "message": "!*",
+        "htmlMessage": "!*",
+        "type": 1,
+        "createdAt": "2026-01-28 15:35:47"
+      },
+      {
+        "id": 597185546,
+        "subject": "",
+        "message": "All good, thanks. \n\nFYI the plug in basin in bathroom doesn’t come back up if you put it down. I’ve put back up by reaching underneath for now, and no issue for us. Letting you know for next people. ",
+        "htmlMessage": "All good, thanks. \n\nFYI the plug in basin in bathroom doesn’t come back up if you put it down. I’ve put back up by reaching underneath for now, and no issue for us. Letting you know for next people. ",
+        "type": 1,
+        "createdAt": "2026-01-29 11:08:36"
+      },
+      {
+        "id": 597505431,
+        "subject": "",
+        "message": "Also bathroom lock is a bit dodgy - just got stuck in there for a few minutes!",
+        "htmlMessage": "Also bathroom lock is a bit dodgy - just got stuck in there for a few minutes!",
+        "type": 1,
+        "createdAt": "2026-01-29 21:30:35"
+      },
+      {
+        "id": 597505576,
+        "subject": "",
+        "message": "(Won’t lock going forward - just letting you know ☺️)",
+        "htmlMessage": "(Won’t lock going forward - just letting you know ☺️)",
+        "type": 1,
+        "createdAt": "2026-01-29 21:30:53"
+      }
+    ]
+  },
+  {
+    "reservation_id": 123177576,
+    "guest_name": "Lucille Michelet",
+    "arrival": "2026-01-31",
+    "departure": "2026-02-07",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 586473011,
+        "subject": "",
+        "message": "Bonsoir,\nnous sommes une famille avec 3 enfants qui souhaite séjourner 1 semaine à Grenoble pour des vacances.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-01-08 22:54:30"
+      },
+      {
+        "id": 597424146,
+        "subject": "",
+        "message": "Bonjour,\n\n\njuste un petit message pour vous confirmer que nous arriverons bien sur Grenoble ce samedi, en soirée.\n\n\nCordialement\n\n\nLucille",
+        "htmlMessage": "Bonjour,\n\n\njuste un petit message pour vous confirmer que nous arriverons bien sur Grenoble ce samedi, en soirée.\n\n\nCordialement\n\n\nLucille",
+        "type": 1,
+        "createdAt": "2026-01-29 18:43:16"
+      },
+      {
+        "id": 598614091,
+        "subject": "",
+        "message": "Bonsoir,\nnous sommes bien arrivés, l'appartement est très mignon, nous sommes ravis.\nPour la clé des toilettes, ce n'est pas un problème, il n'est pas nécessaire de réparer quoi que ce soit pendant notre séjour.",
+        "htmlMessage": "Bonsoir,\nnous sommes bien arrivés, l'appartement est très mignon, nous sommes ravis.\nPour la clé des toilettes, ce n'est pas un problème, il n'est pas nécessaire de réparer quoi que ce soit pendant notre séjour.",
+        "type": 1,
+        "createdAt": "2026-01-31 20:17:09"
+      },
+      {
+        "id": 598614951,
+        "subject": "",
+        "message": "Les 3 clés sur le trousseau, pour quelles portes sont-elles?",
+        "htmlMessage": "Les 3 clés sur le trousseau, pour quelles portes sont-elles?",
+        "type": 1,
+        "createdAt": "2026-01-31 20:19:05"
+      },
+      {
+        "id": 598615496,
+        "subject": "",
+        "message": "Et concernant le tri des poubelles, pourriez-vous juste m'indiquer s'il vous plaît comment il s'effectue sur Grenoble?",
+        "htmlMessage": "Et concernant le tri des poubelles, pourriez-vous juste m'indiquer s'il vous plaît comment il s'effectue sur Grenoble?",
+        "type": 1,
+        "createdAt": "2026-01-31 20:20:11"
+      },
+      {
+        "id": 598638861,
+        "subject": "",
+        "message": "Merci pour toutes ces précisions.",
+        "htmlMessage": "Merci pour toutes ces précisions.",
+        "type": 1,
+        "createdAt": "2026-01-31 21:08:40"
+      },
+      {
+        "id": 599732781,
+        "subject": "",
+        "message": "Bonsoir,\nnous ne manquons de rien et profitons bien de Grenoble et de sa région.\nBonne soirée à vous.\nLucille",
+        "htmlMessage": "Bonsoir,\nnous ne manquons de rien et profitons bien de Grenoble et de sa région.\nBonne soirée à vous.\nLucille",
+        "type": 1,
+        "createdAt": "2026-02-02 19:35:24"
+      },
+      {
+        "id": 600350806,
+        "subject": "",
+        "message": "Bonsoir,\nune petite question: serait-il éventuellement possible de ne libérer l'appartement samedi prochain qu'en début d'après-midi?\nBonne soirée\nLucille",
+        "htmlMessage": "Bonsoir,\nune petite question: serait-il éventuellement possible de ne libérer l'appartement samedi prochain qu'en début d'après-midi?\nBonne soirée\nLucille",
+        "type": 1,
+        "createdAt": "2026-02-03 22:15:52"
+      },
+      {
+        "id": 600536271,
+        "subject": "",
+        "message": "Bonjour,\nNous aimerions partir à 14h. Est-ce que cela serait possible?",
+        "htmlMessage": "Bonjour,\nNous aimerions partir à 14h. Est-ce que cela serait possible?",
+        "type": 1,
+        "createdAt": "2026-02-04 10:31:41"
+      },
+      {
+        "id": 601443921,
+        "subject": "",
+        "message": "Bonsoir Johan,\nmerci beaucoup, c'est très gentil de votre part.\nNous penserons à la personne venant s'occuper du ménage.\nBonne soirée à vous.",
+        "htmlMessage": "Bonsoir Johan,\nmerci beaucoup, c'est très gentil de votre part.\nNous penserons à la personne venant s'occuper du ménage.\nBonne soirée à vous.",
+        "type": 1,
+        "createdAt": "2026-02-05 21:12:18"
+      }
+    ]
+  },
+  {
+    "reservation_id": 126730291,
+    "guest_name": "Yasmine Boutayeb",
+    "arrival": "2026-02-07",
+    "departure": "2026-02-10",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 600914661,
+        "subject": "",
+        "message": "Bonjour Johan,\n\nJe viens passer un week-end à Grenoble avec mon compagnon, ma sœur et mon beau-frère afin de rendre visite à notre famille. Votre appartement nous a tout de suite plu pour son emplacement et son style.\n\nÀ bientôt, cordialement, \n\nYasmine.",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-04 23:02:06"
+      },
+      {
+        "id": 600915076,
+        "subject": "",
+        "message": "Merci pour votre réactivité malgré l’heure tardive, passez une bonne soirée :) !",
+        "htmlMessage": "Merci pour votre réactivité malgré l’heure tardive, passez une bonne soirée :) !",
+        "type": 1,
+        "createdAt": "2026-02-04 23:04:55"
+      },
+      {
+        "id": 603970559,
+        "subject": "",
+        "message": "Bonjour Johanne, est-ce possible de rendre l’appartement pour 13 heures s’il vous plaît car nous avons le train pour 15 heures si possible. Ça serait très gentil de votre part. Merci beaucoup",
+        "htmlMessage": "Bonjour Johanne, est-ce possible de rendre l’appartement pour 13 heures s’il vous plaît car nous avons le train pour 15 heures si possible. Ça serait très gentil de votre part. Merci beaucoup",
+        "type": 1,
+        "createdAt": "2026-02-10 08:02:47"
+      },
+      {
+        "id": 603976895,
+        "subject": "",
+        "message": "Oui je veux bien si ça serait pas trop vous en demander et vraiment désolé",
+        "htmlMessage": "Oui je veux bien si ça serait pas trop vous en demander et vraiment désolé",
+        "type": 1,
+        "createdAt": "2026-02-10 08:15:18"
+      },
+      {
+        "id": 603940484,
+        "subject": "",
+        "message": "Top merci beaucoup ",
+        "htmlMessage": "Top merci beaucoup ",
+        "type": 1,
+        "createdAt": "2026-02-10 08:55:18"
+      },
+      {
+        "id": 604028193,
+        "subject": "",
+        "message": "Bonjour, \n\nLe séjour c’est passer merveilleusement bien, l’appartement est complet, confortable et cosy on s’y sent comme chez soi, votre compréhension et écoute ainsi que votre réactivité sont tout autant agréables, merci pour ce séjour et votre réactivité 😁",
+        "htmlMessage": "Bonjour, \n\nLe séjour c’est passer merveilleusement bien, l’appartement est complet, confortable et cosy on s’y sent comme chez soi, votre compréhension et écoute ainsi que votre réactivité sont tout autant agréables, merci pour ce séjour et votre réactivité 😁",
+        "type": 1,
+        "createdAt": "2026-02-10 12:05:19"
+      }
+    ]
+  },
+  {
+    "reservation_id": 127399179,
+    "guest_name": "Marie Noëlle Chéreau",
+    "arrival": "2026-02-10",
+    "departure": "2026-02-11",
+    "channel": "Booking.com",
+    "messages": [
+      {
+        "id": 603971215,
+        "subject": "",
+        "message": "I'd like to request check-in at 17:00 - 18:00. Is this ok?",
+        "htmlMessage": "",
+        "type": 1,
+        "createdAt": "2026-02-10 07:16:35"
+      },
+      {
+        "id": 603971211,
+        "subject": "",
+        "message": "Request approved\nBonjour Marie Noëlle oui bien sûr",
+        "htmlMessage": "",
+        "type": 2,
+        "createdAt": "2026-02-10 07:42:07"
+      },
+      {
+        "id": 603972751,
+        "subject": "Confirmation de réservation",
+        "message": "\n\n\n\n  \n    \n    \n  \n  \n    \n      Bonjour Marie,\r\n\r\nMerci beaucoup pour votre réservation.\r\n\r\nNous sommes ravis de vous accueillir !\r\n\r\nVeuillez nous contacter à notre adresse email martinsson.rouveyrol@gmail.com, l'accès se fera en toute autonomie donc vous pouvez arriver à l'heure de votre convenance. Vous recevrez les codes d'accès environ 24h avant votre arrivé. \r\n\r\nLes draps et serviettes sont fournies.\r\n\r\nSi vous avez besoin d'arriver plus tôt c'est généralement possible moyennant un petit supplément, contactez nous pour qu'on puisse valider la possibilité et l'organiser.\r\n\r\nSi vous désirez d'autres informations, nous nous tenons bien évidemment à votre disposition! :)\r\n\r\nÀ bientôt !\r\nVirginie & Johan    \n  \n\n",
+        "htmlMessage": "\n<!DOCTYPE html>\n<html>\n\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-Type\"  content=\"text/html charset=UTF-8\" />\n  </head>\n  <body>\n    <p>\n      Bonjour Marie,<br />\r\n<br />\r\nMerci beaucoup pour votre réservation.<br />\r\n<br />\r\nNous sommes ravis de vous accueillir !<br />\r\n<br />\r\nVeuillez nous contacter à notre adresse email martinsson.rouveyrol@gmail.com, l'accès se fera en toute autonomie donc vous pouvez arriver à l'heure de votre convenance. Vous recevrez les codes d'accès environ 24h avant votre arrivé. <br />\r\n<br />\r\nLes draps et serviettes sont fournies.<br />\r\n<br />\r\nSi vous avez besoin d'arriver plus tôt c'est généralement possible moyennant un petit supplément, contactez nous pour qu'on puisse valider la possibilité et l'organiser.<br />\r\n<br />\r\nSi vous désirez d'autres informations, nous nous tenons bien évidemment à votre disposition! :)<br />\r\n<br />\r\nÀ bientôt !<br />\r\nVirginie & Johan    </p>\n  </body>\n</html>\n",
+        "type": 2,
+        "createdAt": "2026-02-10 10:14:10"
+      },
+      {
+        "id": 603972791,
+        "subject": "Le Matisse - Les instructions d'arrivée",
+        "message": "\n\n\n\n  \n    \n    \n  \n  \n    \n      Bonjour Marie,\r\n\r\nPour ouvrir la porte de l'immeuble vous ferez le code 2838\r\nL'appartement se trouve droit devant, à côté des escaliers (au RDC)\r\nIl y a une petit clavier à droite de la porte: le code est le 039727804#\r\nCe code est qu'à vous et sera actif pendant toute la durée de votre sejour.\r\n\r\nVous trouverez toute autre information essentielle ici: https://guest.smoobu.com/?t=fpq62d8a265&b=127399179\r\n\r\nSi jamais vous avez besoin d'entrer avant, contactez-nous.\r\n\r\nNous restons à votre disposition pour toute question par chat, email martinsson.rouveyrol@gmail.com ou téléphone 06 19 44 14 71\r\n\r\nProfitez bien de votre séjour\r\nVirginie & Johan    \n  \n\n",
+        "htmlMessage": "\n<!DOCTYPE html>\n<html>\n\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-Type\"  content=\"text/html charset=UTF-8\" />\n  </head>\n  <body>\n    <p>\n      Bonjour Marie,<br />\r\n<br />\r\nPour ouvrir la porte de l'immeuble vous ferez le code 2838<br />\r\nL'appartement se trouve droit devant, à côté des escaliers (au RDC)<br />\r\nIl y a une petit clavier à droite de la porte: le code est le 039727804#<br />\r\nCe code est qu'à vous et sera actif pendant toute la durée de votre sejour.<br />\r\n<br />\r\nVous trouverez toute autre information essentielle ici: https://guest.smoobu.com/?t=fpq62d8a265&b=127399179<br />\r\n<br />\r\nSi jamais vous avez besoin d'entrer avant, contactez-nous.<br />\r\n<br />\r\nNous restons à votre disposition pour toute question par chat, email martinsson.rouveyrol@gmail.com ou téléphone 06 19 44 14 71<br />\r\n<br />\r\nProfitez bien de votre séjour<br />\r\nVirginie & Johan    </p>\n  </body>\n</html>\n",
+        "type": 2,
+        "createdAt": "2026-02-10 10:14:14"
+      },
+      {
+        "id": 604445215,
+        "subject": "Comment pouvons nous améliorer votre séjour?",
+        "message": "\n\n\n\n  \n    \n    \n  \n  \n    \n      Bonjour Marie,\r\n\r\nLe logement a-t-il tout ce dont vous avez besoin?\r\nPouvons-nous faire quelque chose pour améliorer votre séjour?\r\n\r\nN'hésitez pas à nous contacter si vous avez besoin de quelque chose d'autre ou si vous avez des questions.\r\n\r\nProfitez  pleinement de votre séjour!\r\nVirginie & Johan    \n  \n\n",
+        "htmlMessage": "\n<!DOCTYPE html>\n<html>\n\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-Type\"  content=\"text/html charset=UTF-8\" />\n  </head>\n  <body>\n    <p>\n      Bonjour Marie,<br />\r\n<br />\r\nLe logement a-t-il tout ce dont vous avez besoin?<br />\r\nPouvons-nous faire quelque chose pour améliorer votre séjour?<br />\r\n<br />\r\nN'hésitez pas à nous contacter si vous avez besoin de quelque chose d'autre ou si vous avez des questions.<br />\r\n<br />\r\nProfitez  pleinement de votre séjour!<br />\r\nVirginie & Johan    </p>\n  </body>\n</html>\n",
+        "type": 2,
+        "createdAt": "2026-02-11 10:00:13"
+      },
+      {
+        "id": 604506039,
+        "subject": "Merci pour votre séjour!",
+        "message": "\n\n\n\n  \n    \n    \n  \n  \n    \n      Bonjour Marie,\r\n\r\nnous espérons vraiment que vous avez passé un bon moment et que vous vous êtes sentis comme chez vous dans notre appartement!\r\n\r\nNous serions ravis si vous prenez le temps de nous dire ce qui vous a plu, mais également ce que vous aimeriez qu'on améliore d'ici votre prochain séjour ;)\r\n\r\nBien à vous\r\nVirginie & Johan    \n  \n\n",
+        "htmlMessage": "\n<!DOCTYPE html>\n<html>\n\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-Type\"  content=\"text/html charset=UTF-8\" />\n  </head>\n  <body>\n    <p>\n      Bonjour Marie,<br />\r\n<br />\r\nnous espérons vraiment que vous avez passé un bon moment et que vous vous êtes sentis comme chez vous dans notre appartement!<br />\r\n<br />\r\nNous serions ravis si vous prenez le temps de nous dire ce qui vous a plu, mais également ce que vous aimeriez qu'on améliore d'ici votre prochain séjour ;)<br />\r\n<br />\r\nBien à vous<br />\r\nVirginie & Johan    </p>\n  </body>\n</html>\n",
+        "type": 2,
+        "createdAt": "2026-02-11 12:00:11"
+      }
+    ]
+  },
+  {
+    "reservation_id": 127345216,
+    "guest_name": "Gizelli Alcântara",
+    "arrival": "2026-02-11",
+    "departure": "2026-02-14",
+    "channel": "Airbnb",
+    "messages": [
+      {
+        "id": 603760426,
+        "subject": "",
+        "message": "Olá. Tem mercado e farmácia próximo ao apartamento?",
+        "htmlMessage": "Olá. Tem mercado e farmácia próximo ao apartamento?",
+        "type": 1,
+        "createdAt": "2026-02-09 19:42:49"
+      },
+      {
+        "id": 603778441,
+        "subject": "",
+        "message": "Obrigada ",
+        "htmlMessage": "Obrigada ",
+        "type": 1,
+        "createdAt": "2026-02-09 20:15:14"
+      },
+      {
+        "id": 604554811,
+        "subject": "",
+        "message": "Olá  existe a possibilidade de entrar mais cedo? Já estamos na cidade ",
+        "htmlMessage": "Olá  existe a possibilidade de entrar mais cedo? Já estamos na cidade ",
+        "type": 1,
+        "createdAt": "2026-02-11 13:54:28"
+      },
+      {
+        "id": 604569463,
+        "subject": "",
+        "message": "Obrigada ",
+        "htmlMessage": "Obrigada ",
+        "type": 1,
+        "createdAt": "2026-02-11 14:21:52"
+      },
+      {
+        "id": 604998502,
+        "subject": "",
+        "message": "Bom dia. \nNão encontrei  o carregador  procurei aqui. Porém se eu encontrar eu aviso você",
+        "htmlMessage": "Bom dia. \nNão encontrei  o carregador  procurei aqui. Porém se eu encontrar eu aviso você",
+        "type": 1,
+        "createdAt": "2026-02-12 11:02:23"
+      },
+      {
+        "id": 604998632,
+        "subject": "",
+        "message": "A estadia está maravilhosa obrigada ",
+        "htmlMessage": "A estadia está maravilhosa obrigada ",
+        "type": 1,
+        "createdAt": "2026-02-12 11:02:30"
+      }
+    ]
+  },
+  {
     "reservation_id": 124495676,
     "guest_name": "Joao Paulo Felismino",
     "arrival": "2026-02-14",
