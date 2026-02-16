@@ -160,11 +160,11 @@ class Pipeline:
         # Build the query context for the AI to compose a reply
         stub_query = CleanerQuery(
             request_id=response.request_id,
-            cleaner_name="Marie",
+            cleaner_name="Virginie",
             guest_name="Guest",
             property_name="Le Matisse",
             request_type=req.intent if req else "early_checkin",
-            original_time="15:00",
+            original_time="17:00",
             requested_time="12:00",
             date="2026-01-01",
             message=req.guest_message if req else "(unknown)",
