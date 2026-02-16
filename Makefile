@@ -9,3 +9,6 @@ review:
 
 fetch-threads:
 	set -a && source .env && set +a && python scripts/fetch_message_threads.py
+
+run:
+	set -a && source .env && set +a && python scripts/run.py
