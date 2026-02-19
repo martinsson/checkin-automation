@@ -105,6 +105,7 @@ async def poll_once(pipeline: Pipeline, smoobu: SmoobuClient, apartment_id: int,
         previous = [m.body for m in guest_messages[:-1]]
 
         context = ConversationContext(
+            reservation_id=res.reservation_id,
             guest_name=res.guest_name,
             property_name=f"Apartment {res.apartment_id}",
             arrival_date=res.arrival,
