@@ -1,16 +1,14 @@
 """
-Roundtrip test: full message flow using simulators only.
+Phase 0 walking-skeleton roundtrip tests.
+
+These tests pre-date the real Pipeline class and use a minimal
+MessageForwarder stub to verify that SmoobuGateway and CleanerNotifier
+wire together correctly at the port level. They are kept as a port-wiring
+smoke test; see test_pipeline.py for full pipeline behaviour coverage.
 
 No network, no credentials, no mocking framework. Uses:
 - SimulatorSmoobuGateway  (in-memory fake for Smoobu)
 - ConsoleCleanerNotifier  (in-memory fake for cleaner communication)
-
-The test proves the orchestration wiring works:
-1. Guest sends a message (injected into SimulatorSmoobuGateway)
-2. Orchestrator reads it, forwards to cleaner
-3. Cleaner replies (injected via ConsoleCleanerNotifier.simulate_response)
-4. Orchestrator polls the response, sends reply to guest
-5. We verify the reply appeared in SimulatorSmoobuGateway
 """
 
 import pytest

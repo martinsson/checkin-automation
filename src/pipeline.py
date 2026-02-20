@@ -36,6 +36,7 @@ class PipelineConfig:
     parser: ResponseParser
     composer: ReplyComposer
     memory: RequestMemory
+    cleaner_name: str = "Marie"
 
 
 @dataclass
@@ -85,9 +86,25 @@ class Pipeline:
 
         request_id = str(uuid.uuid4())
 
+        original_time = (
+            context.default_checkin_time
+            if result.intent == "early_checkin"
+            else context.default_checkout_time
+        )
+        relevant_date = (
+            context.arrival_date
+            if result.intent == "early_checkin"
+            else context.departure_date
+        )
+
         # Save the request in memory
         await self._cfg.memory.save_request(
             reservation_id, result.intent, request_id, message,
+            guest_name=context.guest_name,
+            property_name=context.property_name,
+            original_time=original_time,
+            requested_time=result.extracted_time or "?",
+            relevant_date=relevant_date,
         )
 
         # If AI needs more info, draft a follow-up question
@@ -112,7 +129,7 @@ class Pipeline:
         # Step 4: prepare cleaner query → saved as draft
         query = CleanerQuery(
             request_id=request_id,
-            cleaner_name="Marie",               # TODO: look up from config
+            cleaner_name=self._cfg.cleaner_name,
             guest_name=context.guest_name,
             property_name=context.property_name,
             request_type=result.intent,
@@ -157,16 +174,16 @@ class Pipeline:
         # Look up the original request from memory
         req = await self._cfg.memory.get_request(response.request_id)
 
-        # Build the query context for the AI to compose a reply
+        # Reconstruct the CleanerQuery from the stored request
         stub_query = CleanerQuery(
             request_id=response.request_id,
-            cleaner_name="Virginie",
-            guest_name="Guest",
-            property_name="Le Matisse",
+            cleaner_name=self._cfg.cleaner_name,
+            guest_name=req.guest_name if req else "",
+            property_name=req.property_name if req else "",
             request_type=req.intent if req else "early_checkin",
-            original_time="17:00",
-            requested_time="12:00",
-            date="2026-01-01",
+            original_time=req.original_time if req else "",
+            requested_time=req.requested_time if req else "",
+            date=req.relevant_date if req else "",
             message=req.guest_message if req else "(unknown)",
         )
 

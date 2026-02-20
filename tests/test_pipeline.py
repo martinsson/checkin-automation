@@ -137,10 +137,11 @@ async def test_missing_time_drafts_followup(pipeline, memory):
     )
     assert result.action == "followup_drafted"
 
-    # A follow-up draft was saved
+    # A follow-up draft was saved — and no cleaner_query was created
     drafts = await memory.get_pending_drafts()
     assert len(drafts) == 1
     assert drafts[0].step == "followup"
+    assert "cleaner_query" not in [d.step for d in drafts]
     assert "heure" in drafts[0].draft_body.lower() or "?" in drafts[0].draft_body
 
 

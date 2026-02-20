@@ -17,7 +17,12 @@ CREATE TABLE IF NOT EXISTS requests (
     status      TEXT NOT NULL DEFAULT 'pending_acknowledgment',
     created_at  TEXT NOT NULL,
     request_id  TEXT NOT NULL UNIQUE,
-    guest_message TEXT NOT NULL
+    guest_message TEXT NOT NULL,
+    guest_name  TEXT NOT NULL DEFAULT '',
+    property_name TEXT NOT NULL DEFAULT '',
+    original_time TEXT NOT NULL DEFAULT '',
+    requested_time TEXT NOT NULL DEFAULT '',
+    relevant_date TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS drafts (
@@ -66,11 +71,19 @@ class SqliteRequestMemory(RequestMemory):
         intent: str,
         request_id: str,
         guest_message: str,
+        guest_name: str = "",
+        property_name: str = "",
+        original_time: str = "",
+        requested_time: str = "",
+        relevant_date: str = "",
     ) -> None:
         self._conn.execute(
-            "INSERT INTO requests (reservation_id, intent, request_id, guest_message, created_at)"
-            " VALUES (?, ?, ?, ?, ?)",
-            (reservation_id, intent, request_id, guest_message, _now()),
+            "INSERT INTO requests"
+            " (reservation_id, intent, request_id, guest_message, created_at,"
+            "  guest_name, property_name, original_time, requested_time, relevant_date)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (reservation_id, intent, request_id, guest_message, _now(),
+             guest_name, property_name, original_time, requested_time, relevant_date),
         )
         self._conn.commit()
 
@@ -87,6 +100,17 @@ class SqliteRequestMemory(RequestMemory):
         ).fetchone()
         if not row:
             return None
+        return self._row_to_request(row)
+
+    async def get_history(self, reservation_id: int) -> list[ProcessedRequest]:
+        rows = self._conn.execute(
+            "SELECT * FROM requests WHERE reservation_id = ? ORDER BY created_at",
+            (reservation_id,),
+        ).fetchall()
+        return [self._row_to_request(r) for r in rows]
+
+    @staticmethod
+    def _row_to_request(row) -> ProcessedRequest:
         return ProcessedRequest(
             reservation_id=row["reservation_id"],
             intent=row["intent"],
@@ -94,24 +118,12 @@ class SqliteRequestMemory(RequestMemory):
             created_at=_parse_dt(row["created_at"]),
             request_id=row["request_id"],
             guest_message=row["guest_message"],
+            guest_name=row["guest_name"],
+            property_name=row["property_name"],
+            original_time=row["original_time"],
+            requested_time=row["requested_time"],
+            relevant_date=row["relevant_date"],
         )
-
-    async def get_history(self, reservation_id: int) -> list[ProcessedRequest]:
-        rows = self._conn.execute(
-            "SELECT * FROM requests WHERE reservation_id = ? ORDER BY created_at",
-            (reservation_id,),
-        ).fetchall()
-        return [
-            ProcessedRequest(
-                reservation_id=r["reservation_id"],
-                intent=r["intent"],
-                status=r["status"],
-                created_at=_parse_dt(r["created_at"]),
-                request_id=r["request_id"],
-                guest_message=r["guest_message"],
-            )
-            for r in rows
-        ]
 
     # -- draft management ----------------------------------------------------
 
@@ -129,6 +141,7 @@ class SqliteRequestMemory(RequestMemory):
             (request_id, reservation_id, intent, step, draft_body, _now()),
         )
         self._conn.commit()
+        assert cur.lastrowid is not None
         return cur.lastrowid
 
     async def get_pending_drafts(self) -> list[Draft]:

@@ -20,6 +20,11 @@ class ProcessedRequest:
     created_at: datetime
     request_id: str      # correlation ID
     guest_message: str   # the original guest message
+    guest_name: str = ""
+    property_name: str = ""
+    original_time: str = ""   # default check-in or check-out time
+    requested_time: str = ""  # time the guest requested
+    relevant_date: str = ""   # arrival_date for early_checkin, departure_date for late_checkout
 
 
 @dataclass
@@ -59,6 +64,11 @@ class RequestMemory(ABC):
         intent: str,
         request_id: str,
         guest_message: str,
+        guest_name: str = "",
+        property_name: str = "",
+        original_time: str = "",
+        requested_time: str = "",
+        relevant_date: str = "",
     ) -> None:
         """Create a new request record."""
         ...

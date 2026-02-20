@@ -13,8 +13,13 @@ class SimulatorSmoobuGateway(SmoobuGateway):
 
     def __init__(self):
         self._messages: dict[int, list[GuestMessage]] = {}
+        self._reservations: list[ActiveReservation] = []
         self.sent: list[tuple[int, str, str]] = []
         self._next_id = 1
+
+    def inject_active_reservation(self, reservation: ActiveReservation) -> None:
+        """Test helper: register a reservation as active."""
+        self._reservations.append(reservation)
 
     def inject_guest_message(
         self, reservation_id: int, subject: str, body: str
@@ -37,7 +42,11 @@ class SimulatorSmoobuGateway(SmoobuGateway):
         arrival_from: str,
         arrival_to: str,
     ) -> list[ActiveReservation]:
-        return []
+        return [
+            r for r in self._reservations
+            if r.apartment_id == apartment_id
+            and arrival_from <= r.arrival <= arrival_to
+        ]
 
     def send_message(self, reservation_id: int, subject: str, body: str) -> None:
         self.sent.append((reservation_id, subject, body))

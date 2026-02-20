@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from src.communication.ports import CleanerNotifier, CleanerQuery
+from src.communication.ports import CleanerNotifier, CleanerQuery, CleanerResponse
 
 
 class CleanerNotifierContract(ABC):
@@ -56,10 +56,8 @@ class CleanerNotifierContract(ABC):
 
     async def _poll_until_found(
         self, notifier: CleanerNotifier, request_id: str
-    ) -> "CleanerQuery | None":
+    ) -> "CleanerResponse | None":
         """Poll for a response matching *request_id*, respecting class timing."""
-        from src.communication.ports import CleanerResponse
-
         deadline = time.time() + self.poll_max_seconds
         while True:
             responses = await notifier.poll_responses()
@@ -78,6 +76,12 @@ class CleanerNotifierContract(ABC):
         query = self._make_query(f"contract-{uuid.uuid4().hex[:8]}")
         tracking_id = await notifier.send_query(query)
         assert tracking_id  # non-empty string
+
+    @pytest.mark.asyncio
+    async def test_poll_empty_by_default(self):
+        notifier = self.create_notifier()
+        responses = await notifier.poll_responses()
+        assert responses == []
 
     @pytest.mark.asyncio
     async def test_roundtrip_send_reply_poll(self):
@@ -99,3 +103,25 @@ class CleanerNotifierContract(ABC):
         )
         assert matched.request_id == request_id
         assert "Yes" in matched.raw_text
+
+    @pytest.mark.asyncio
+    async def test_response_not_returned_twice(self):
+        notifier = self.create_notifier()
+        request_id = f"contract-{uuid.uuid4().hex[:8]}"
+        query = self._make_query(request_id)
+
+        await notifier.send_query(query)
+
+        if self.pre_reply_delay:
+            await asyncio.sleep(self.pre_reply_delay)
+
+        await self.make_cleaner_reply(request_id, "Oui !")
+
+        first = await self._poll_until_found(notifier, request_id)
+        assert first is not None
+
+        # Second poll must NOT return the same response
+        second = await notifier.poll_responses()
+        assert all(r.request_id != request_id for r in second), (
+            "Response was returned a second time by poll_responses()"
+        )

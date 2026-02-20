@@ -44,3 +44,28 @@ class SmoobuGatewayContract(ABC):
             f"Sent message with tag {tag!r} not found in "
             f"{len(messages)} messages"
         )
+
+    def test_get_messages_empty_reservation(self):
+        gw = self.create_gateway()
+        messages = gw.get_messages(reservation_id=999999999)
+        assert isinstance(messages, list)
+        assert messages == []
+
+    def test_get_active_reservations_returns_list(self):
+        gw = self.create_gateway()
+        # Use a past date range — returns empty for both real and simulator
+        result = gw.get_active_reservations(
+            apartment_id=999999,
+            arrival_from="2000-01-01",
+            arrival_to="2000-01-02",
+        )
+        assert isinstance(result, list)
+
+    def test_get_active_reservations_empty_for_out_of_range(self):
+        gw = self.create_gateway()
+        result = gw.get_active_reservations(
+            apartment_id=999999,
+            arrival_from="2000-01-01",
+            arrival_to="2000-01-01",
+        )
+        assert result == []

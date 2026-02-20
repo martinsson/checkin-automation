@@ -16,6 +16,7 @@ Environment variables (all required unless noted):
     POLL_INTERVAL           - seconds between polls (default: 60)
     LOOKAHEAD_DAYS          - how many days ahead to look for arrivals (default: 14)
     DB_PATH                 - SQLite database path (default: data/checkin.db)
+    CLEANER_NAME            - name of the cleaning staff contact (default: Marie)
 
     # Email (only when CLEANING_STAFF_CHANNEL=email)
     EMAIL_SMTP_HOST, EMAIL_SMTP_PORT, EMAIL_USER, EMAIL_PASSWORD
@@ -26,7 +27,6 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import date, timedelta
 
 # Make sure project root is on sys.path when run as a script
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,7 +36,7 @@ from src.adapters.claude_response import ClaudeGuestAcknowledger, ClaudeReplyCom
 from src.adapters.smoobu_client import SmoobuClient
 from src.adapters.sqlite_memory import SqliteRequestMemory
 from src.communication.factory import create_cleaner_notifier
-from src.domain.intent import ConversationContext
+from src.daemon import poll_once
 from src.pipeline import Pipeline, PipelineConfig
 
 logging.basicConfig(
@@ -60,6 +60,7 @@ def build_pipeline() -> Pipeline:
     db_path = os.environ.get("DB_PATH", "data/checkin.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
+    cleaner_name = os.environ.get("CLEANER_NAME", "Marie")
     config = PipelineConfig(
         cleaner=create_cleaner_notifier(),
         classifier=ClaudeIntentClassifier(api_key=api_key),
@@ -67,77 +68,10 @@ def build_pipeline() -> Pipeline:
         parser=ClaudeResponseParser(api_key=api_key),
         composer=ClaudeReplyComposer(api_key=api_key),
         memory=SqliteRequestMemory(db_path=db_path),
+        cleaner_name=cleaner_name,
     )
     return Pipeline(config)
 
-
-async def poll_once(pipeline: Pipeline, smoobu: SmoobuClient, apartment_id: int, lookahead_days: int) -> None:
-    today = date.today()
-    arrival_from = today.isoformat()
-    arrival_to = (today + timedelta(days=lookahead_days)).isoformat()
-
-    log.info("Fetching active reservations %s → %s", arrival_from, arrival_to)
-    try:
-        reservations = smoobu.get_active_reservations(
-            apartment_id=apartment_id,
-            arrival_from=arrival_from,
-            arrival_to=arrival_to,
-        )
-    except Exception as exc:
-        log.error("Failed to fetch reservations: %s", exc)
-        return
-
-    log.info("Found %d reservation(s)", len(reservations))
-
-    for res in reservations:
-        try:
-            messages = smoobu.get_messages(res.reservation_id)
-        except Exception as exc:
-            log.error("Failed to fetch messages for reservation %d: %s", res.reservation_id, exc)
-            continue
-
-        # Only process the last guest message to avoid re-processing history
-        guest_messages = [m for m in messages if m.body.strip()]
-        if not guest_messages:
-            continue
-
-        latest = guest_messages[-1]
-        previous = [m.body for m in guest_messages[:-1]]
-
-        context = ConversationContext(
-            reservation_id=res.reservation_id,
-            guest_name=res.guest_name,
-            property_name=f"Apartment {res.apartment_id}",
-            arrival_date=res.arrival,
-            departure_date=res.departure,
-            default_checkin_time="17:00",
-            default_checkout_time="11:00",
-            previous_messages=previous,
-        )
-
-        try:
-            result = await pipeline.process_message(
-                reservation_id=res.reservation_id,
-                message=latest.body,
-                context=context,
-            )
-            if result.action != "ignored" and result.action != "already_processed":
-                log.info(
-                    "Reservation %d → %s: %s",
-                    res.reservation_id,
-                    result.action,
-                    result.details[:60],
-                )
-        except Exception as exc:
-            log.error("Pipeline error for reservation %d: %s", res.reservation_id, exc)
-
-    # Poll for cleaner responses
-    try:
-        cleaner_results = await pipeline.process_cleaner_responses()
-        for r in cleaner_results:
-            log.info("Cleaner response processed → %s: %s", r.action, r.details[:60])
-    except Exception as exc:
-        log.error("Failed to process cleaner responses: %s", exc)
 
 
 async def main() -> None:

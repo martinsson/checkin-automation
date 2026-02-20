@@ -28,6 +28,46 @@ class TestSimulatorSmoobuContract(SmoobuGatewayContract):
     def get_test_reservation_id(self):
         return 12345
 
+    def test_injected_reservation_returned_within_range(self):
+        from src.adapters.ports import ActiveReservation
+        gw = SimulatorSmoobuGateway()
+        gw.inject_active_reservation(ActiveReservation(
+            reservation_id=1,
+            guest_name="Alice",
+            arrival="2026-06-01",
+            departure="2026-06-05",
+            apartment_id=42,
+        ))
+        result = gw.get_active_reservations(42, "2026-05-31", "2026-06-02")
+        assert len(result) == 1
+        assert result[0].guest_name == "Alice"
+
+    def test_reservation_outside_range_not_returned(self):
+        from src.adapters.ports import ActiveReservation
+        gw = SimulatorSmoobuGateway()
+        gw.inject_active_reservation(ActiveReservation(
+            reservation_id=1,
+            guest_name="Alice",
+            arrival="2026-06-10",
+            departure="2026-06-12",
+            apartment_id=42,
+        ))
+        result = gw.get_active_reservations(42, "2026-06-01", "2026-06-05")
+        assert result == []
+
+    def test_reservation_wrong_apartment_not_returned(self):
+        from src.adapters.ports import ActiveReservation
+        gw = SimulatorSmoobuGateway()
+        gw.inject_active_reservation(ActiveReservation(
+            reservation_id=1,
+            guest_name="Alice",
+            arrival="2026-06-01",
+            departure="2026-06-05",
+            apartment_id=99,
+        ))
+        result = gw.get_active_reservations(42, "2026-05-31", "2026-06-02")
+        assert result == []
+
 
 # ---------------------------------------------------------------------------
 # Real Smoobu API — skipped without credentials

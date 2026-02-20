@@ -110,6 +110,19 @@ class ResponseParserContract(ABC):
         result = await parser.parse("Oui, mais pas avant 13h00.", _req())
         assert result.proposed_time is not None
 
+    @pytest.mark.asyncio
+    async def test_conditional_reply_parsed_as_conditional(self):
+        parser = self.create_parser()
+        result = await parser.parse("Oui mais non, ça dépend.", _req())
+        assert result.answer == "conditional"
+        assert result.conditions is not None
+
+    @pytest.mark.asyncio
+    async def test_unclear_reply_parsed_as_unclear(self):
+        parser = self.create_parser()
+        result = await parser.parse("Je verrai ce que je peux faire...", _req())
+        assert result.answer == "unclear"
+
 
 # ---------------------------------------------------------------------------
 # ReplyComposer contract
