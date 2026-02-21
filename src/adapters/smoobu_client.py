@@ -1,6 +1,8 @@
+from datetime import datetime, timezone
+
 import requests
 
-from .ports import ActiveReservation, GuestMessage, SmoobuGateway
+from .ports import ActiveReservation, GuestMessage, ReservationInfo, SmoobuGateway, Thread, ThreadPage
 
 BASE_URL = "https://login.smoobu.com/api"
 
@@ -29,6 +31,7 @@ class SmoobuClient(SmoobuGateway):
                 message_id=msg.get("id", 0),
                 subject=msg.get("subject", ""),
                 body=msg.get("message", ""),
+                type=msg.get("type", 1),
             )
             for msg in data.get("messages", [])
         ]
@@ -73,3 +76,43 @@ class SmoobuClient(SmoobuGateway):
                 break
             page += 1
         return reservations
+
+    def get_threads(self, page_number: int = 1) -> ThreadPage:
+        resp = self.session.get(
+            f"{BASE_URL}/threads",
+            params={"page_number": page_number, "page_size": 25},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        threads = []
+        for item in data.get("data", []):
+            latest_raw = item.get("latest_message", {}).get("created_at", "")
+            try:
+                latest_at = datetime.fromisoformat(latest_raw.replace("Z", "+00:00"))
+            except (ValueError, AttributeError):
+                latest_at = datetime.now(timezone.utc)
+
+            threads.append(Thread(
+                reservation_id=item.get("booking", {}).get("id", 0),
+                guest_name=item.get("booking", {}).get("guest_name", ""),
+                apartment_name=item.get("apartment", {}).get("name", ""),
+                latest_message_at=latest_at,
+            ))
+
+        total_pages = data.get("page_count", 1)
+        return ThreadPage(threads=threads, has_more=page_number < total_pages)
+
+    def get_reservation(self, reservation_id: int) -> ReservationInfo | None:
+        resp = self.session.get(f"{BASE_URL}/reservations/{reservation_id}")
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        b = resp.json()
+        return ReservationInfo(
+            reservation_id=b["id"],
+            guest_name=b.get("guest-name", ""),
+            apartment_name=b.get("apartment", {}).get("name", ""),
+            arrival=b.get("arrival", ""),
+            departure=b.get("departure", ""),
+        )

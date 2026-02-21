@@ -6,10 +6,11 @@ without pulling in Claude or email adapter dependencies.
 """
 
 import logging
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 
-from src.adapters.ports import SmoobuGateway
+from src.adapters.ports import ReservationInfo, SmoobuGateway
 from src.domain.intent import ConversationContext
+from src.domain.reservation_cache import ReservationCache
 from src.pipeline import Pipeline
 
 log = logging.getLogger(__name__)
@@ -18,35 +19,70 @@ log = logging.getLogger(__name__)
 async def poll_once(
     pipeline: Pipeline,
     smoobu: SmoobuGateway,
-    apartment_id: int,
-    lookahead_days: int,
+    reservation_cache: ReservationCache,
+    threads_cutoff_days: int = 7,
 ) -> None:
-    today = date.today()
-    arrival_from = today.isoformat()
-    arrival_to = (today + timedelta(days=lookahead_days)).isoformat()
+    """
+    One poll cycle using threads as the activity index.
 
-    log.info("Fetching active reservations %s → %s", arrival_from, arrival_to)
-    try:
-        reservations = smoobu.get_active_reservations(
-            apartment_id=apartment_id,
-            arrival_from=arrival_from,
-            arrival_to=arrival_to,
-        )
-    except Exception as exc:
-        log.error("Failed to fetch reservations: %s", exc)
-        return
+    1. Paginate GET /api/threads until all threads on a page are older than cutoff.
+    2. For each unique reservation ID seen, fetch reservation metadata (cached).
+    3. Fetch messages, filter type==1 (guest), process latest via pipeline.
+    4. Poll for cleaner responses.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(days=threads_cutoff_days)
 
-    log.info("Found %d reservation(s)", len(reservations))
-
-    for res in reservations:
+    # Collect unique reservation IDs from threads within the cutoff window
+    reservation_ids: list[int] = []
+    seen_ids: set[int] = set()
+    threads_seen = 0
+    page = 1
+    while True:
         try:
-            messages = smoobu.get_messages(res.reservation_id)
+            thread_page = smoobu.get_threads(page_number=page)
         except Exception as exc:
-            log.error("Failed to fetch messages for reservation %d: %s", res.reservation_id, exc)
+            log.error("Failed to fetch threads page %d: %s", page, exc)
+            break
+
+        if not thread_page.threads:
+            break
+
+        threads_seen += len(thread_page.threads)
+
+        # Stop paginating if all threads on this page are older than cutoff
+        all_old = all(t.latest_message_at < cutoff for t in thread_page.threads)
+        if all_old:
+            log.debug("All threads on page %d older than cutoff — stopping pagination", page)
+            break
+
+        for thread in thread_page.threads:
+            if thread.latest_message_at >= cutoff and thread.reservation_id not in seen_ids:
+                reservation_ids.append(thread.reservation_id)
+                seen_ids.add(thread.reservation_id)
+
+        if not thread_page.has_more:
+            break
+        page += 1
+
+    log.info(
+        "Thread scan: %d thread(s) seen, %d unique reservation(s) within cutoff",
+        threads_seen, len(reservation_ids),
+    )
+
+    for reservation_id in reservation_ids:
+        try:
+            info = _get_reservation(reservation_id, smoobu, reservation_cache)
+            if info is None:
+                log.warning("res=%d: could not fetch metadata — skipping", reservation_id)
+                continue
+
+            messages = smoobu.get_messages(reservation_id)
+        except Exception as exc:
+            log.error("Failed to fetch data for reservation %d: %s", reservation_id, exc)
             continue
 
-        # Only process the last guest message to avoid re-processing history
-        guest_messages = [m for m in messages if m.body.strip()]
+        # Filter to guest messages only (type=1)
+        guest_messages = [m for m in messages if m.type == 1 and m.body.strip()]
         if not guest_messages:
             continue
 
@@ -54,11 +90,11 @@ async def poll_once(
         previous = [m.body for m in guest_messages[:-1]]
 
         context = ConversationContext(
-            reservation_id=res.reservation_id,
-            guest_name=res.guest_name,
-            property_name=f"Apartment {res.apartment_id}",
-            arrival_date=res.arrival,
-            departure_date=res.departure,
+            reservation_id=reservation_id,
+            guest_name=info.guest_name,
+            property_name=info.apartment_name,
+            arrival_date=info.arrival,
+            departure_date=info.departure,
             default_checkin_time="17:00",
             default_checkout_time="11:00",
             previous_messages=previous,
@@ -66,7 +102,7 @@ async def poll_once(
 
         try:
             result = await pipeline.process_message(
-                reservation_id=res.reservation_id,
+                reservation_id=reservation_id,
                 message=latest.body,
                 context=context,
                 message_id=latest.message_id,
@@ -74,12 +110,12 @@ async def poll_once(
             if result.action not in ("ignored", "already_processed"):
                 log.debug(
                     "res=%d action=%s: %s",
-                    res.reservation_id,
+                    reservation_id,
                     result.action,
                     result.details[:60],
                 )
         except Exception as exc:
-            log.error("Pipeline error for reservation %d: %s", res.reservation_id, exc)
+            log.error("Pipeline error for reservation %d: %s", reservation_id, exc)
 
     # Poll for cleaner responses
     try:
@@ -88,3 +124,18 @@ async def poll_once(
             log.info("Cleaner response processed → %s: %s", r.action, r.details[:60])
     except Exception as exc:
         log.error("Failed to process cleaner responses: %s", exc)
+
+
+def _get_reservation(
+    reservation_id: int,
+    smoobu: SmoobuGateway,
+    cache: ReservationCache,
+) -> ReservationInfo | None:
+    """Return reservation info from cache, fetching from gateway on cache miss."""
+    info = cache.get(reservation_id)
+    if info is not None:
+        return info
+    info = smoobu.get_reservation(reservation_id)
+    if info is not None:
+        cache.store(reservation_id, info)
+    return info

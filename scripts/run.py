@@ -1,9 +1,8 @@
 """
 Local process runner for the checkin-automation pipeline.
 
-Polls Smoobu every POLL_INTERVAL seconds for new guest messages on active
-reservations, processes them through the pipeline, and polls for cleaner
-responses.
+Polls Smoobu every POLL_INTERVAL seconds using the thread-based activity index,
+processes new guest messages through the pipeline, and polls for cleaner responses.
 
 Usage:
     source .env && python scripts/run.py
@@ -11,10 +10,9 @@ Usage:
 Environment variables (all required unless noted):
     SMOOBU_API_KEY          - Smoobu API key
     ANTHROPIC_API_KEY       - Anthropic/Claude API key
-    SMOOBU_APARTMENT_ID     - Smoobu apartment ID to monitor
     CLEANING_STAFF_CHANNEL  - "email" or "console" (default: console)
     POLL_INTERVAL           - seconds between polls (default: 60)
-    LOOKAHEAD_DAYS          - how many days ahead to look for arrivals (default: 14)
+    THREADS_CUTOFF_DAYS     - how many days back to scan threads (default: 7)
     DB_PATH                 - SQLite database path (default: data/checkin.db)
     CLEANER_NAME            - name of the cleaning staff contact (default: Marie)
 
@@ -35,6 +33,7 @@ from src.adapters.claude_intent import ClaudeIntentClassifier
 from src.adapters.claude_response import ClaudeGuestAcknowledger, ClaudeReplyComposer, ClaudeResponseParser
 from src.adapters.smoobu_client import SmoobuClient
 from src.adapters.sqlite_memory import SqliteRequestMemory
+from src.adapters.sqlite_reservation_cache import SqliteReservationCache
 from src.communication.factory import create_cleaner_notifier
 from src.daemon import poll_once
 from src.pipeline import Pipeline, PipelineConfig
@@ -73,25 +72,27 @@ def build_pipeline() -> Pipeline:
     return Pipeline(config)
 
 
-
 async def main() -> None:
-    apartment_id = int(_require_env("SMOOBU_APARTMENT_ID"))
     smoobu_api_key = _require_env("SMOOBU_API_KEY")
+    _require_env("ANTHROPIC_API_KEY")  # validated here; build_pipeline() uses it
     poll_interval = int(os.environ.get("POLL_INTERVAL", "60"))
-    lookahead_days = int(os.environ.get("LOOKAHEAD_DAYS", "14"))
+    threads_cutoff_days = int(os.environ.get("THREADS_CUTOFF_DAYS", "7"))
+
+    db_path = os.environ.get("DB_PATH", "data/checkin.db")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     smoobu = SmoobuClient(api_key=smoobu_api_key)
+    reservation_cache = SqliteReservationCache(db_path=db_path)
     pipeline = build_pipeline()
 
     log.info(
-        "Daemon started — apartment=%d  interval=%ds  lookahead=%dd",
-        apartment_id,
+        "Daemon started — interval=%ds  threads_cutoff=%dd",
         poll_interval,
-        lookahead_days,
+        threads_cutoff_days,
     )
 
     while True:
-        await poll_once(pipeline, smoobu, apartment_id, lookahead_days)
+        await poll_once(pipeline, smoobu, reservation_cache, threads_cutoff_days)
         log.info("Sleeping %ds …", poll_interval)
         await asyncio.sleep(poll_interval)
 

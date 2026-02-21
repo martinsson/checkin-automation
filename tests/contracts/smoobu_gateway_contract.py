@@ -69,3 +69,43 @@ class SmoobuGatewayContract(ABC):
             arrival_to="2000-01-01",
         )
         assert result == []
+
+    def test_get_threads_returns_thread_page(self):
+        gw = self.create_gateway()
+        page = gw.get_threads(page_number=1)
+        assert isinstance(page.threads, list)
+        assert isinstance(page.has_more, bool)
+
+    def test_get_threads_sorted_by_recency(self):
+        """Threads must be sorted most-recently-active first."""
+        gw = self.create_gateway()
+        page = gw.get_threads(page_number=1)
+        if len(page.threads) < 2:
+            return  # Not enough data to assert ordering
+        timestamps = [t.latest_message_at for t in page.threads]
+        assert timestamps == sorted(timestamps, reverse=True), (
+            "Threads are not sorted by latest_message_at descending"
+        )
+
+    def test_get_threads_thread_fields_present(self):
+        """Any returned thread must have required fields populated."""
+        gw = self.create_gateway()
+        page = gw.get_threads(page_number=1)
+        for thread in page.threads:
+            assert thread.reservation_id > 0, "Thread must have a reservation_id"
+            assert thread.latest_message_at is not None
+
+    def test_get_reservation_unknown_returns_none(self):
+        gw = self.create_gateway()
+        result = gw.get_reservation(reservation_id=999999999)
+        assert result is None
+
+    def test_get_messages_type_field_present(self):
+        """Messages returned by get_messages must have a type field."""
+        gw = self.create_gateway()
+        reservation_id = self.get_test_reservation_id()
+        gw.send_message(reservation_id, "Test", "Hello")
+        messages = gw.get_messages(reservation_id)
+        for msg in messages:
+            assert hasattr(msg, "type"), "GuestMessage must have a type field"
+            assert msg.type in (1, 2), f"type must be 1 or 2, got {msg.type}"
