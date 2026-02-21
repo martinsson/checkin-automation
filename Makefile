@@ -1,7 +1,14 @@
-.PHONY: test test-integration run review review-ui fetch-threads deploy
+.PHONY: test test-integration run review review-ui fetch-threads build deploy
 
 # Database path (override with: make review DB_PATH=/path/to/checkin.db)
 DB_PATH ?= data/checkin.db
+
+# Hetzner server — configure 'hetzner' alias in ~/.ssh/config, or override:
+#   make deploy SERVER=root@1.2.3.4
+SERVER    ?= hetzner
+REMOTE_DIR := /opt/checkin-automation
+
+IMAGES := checkin-daemon checkin-web
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -22,7 +29,7 @@ test-integration:
 	set -a && source .env && set +a && python -m pytest tests/ -v -s
 
 # ---------------------------------------------------------------------------
-# Run daemon (requires .env)
+# Run daemon locally (requires .env)
 # Required: SMOOBU_API_KEY, ANTHROPIC_API_KEY
 # Optional: POLL_INTERVAL (default 60s), THREADS_CUTOFF_DAYS (default 7),
 #           CLEANING_STAFF_CHANNEL (default console), CLEANER_NAME (default Marie),
@@ -58,12 +65,26 @@ fetch-threads:
 	set -a && source .env && set +a && python scripts/fetch_message_threads.py
 
 # ---------------------------------------------------------------------------
-# Deploy (Docker Compose)
-# Builds images and (re)starts daemon + web services in the background.
-# Requires docker and docker-compose on the host.
+# Build & Deploy to Hetzner
+#
+# Workflow:
+#   make build    — build Docker images locally
+#   make deploy   — push images to server over SSH, restart services
+#
+# First-time server setup (manual, once):
+#   ssh $(SERVER) 'mkdir -p $(REMOTE_DIR)'
+#   scp .env $(SERVER):$(REMOTE_DIR)/.env
 # ---------------------------------------------------------------------------
 
-deploy:
+build:
 	docker compose build
-	docker compose up -d
-	docker compose ps
+
+deploy:
+	@echo "→ Syncing docker-compose.yml to $(SERVER):$(REMOTE_DIR)/"
+	rsync -av docker-compose.yml $(SERVER):$(REMOTE_DIR)/
+	@echo "→ Pushing images ($(IMAGES)) to $(SERVER)"
+	docker save $(IMAGES) | ssh $(SERVER) docker load
+	@echo "→ Restarting services"
+	ssh $(SERVER) 'cd $(REMOTE_DIR) && docker compose up -d'
+	@echo "→ Service status"
+	ssh $(SERVER) 'cd $(REMOTE_DIR) && docker compose ps'
