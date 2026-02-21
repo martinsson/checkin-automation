@@ -50,6 +50,18 @@ class RequestMemory(ABC):
     those are tracked independently (different intent values).
     """
 
+    # -- message-level dedup -------------------------------------------------
+
+    @abstractmethod
+    async def has_message_been_seen(self, message_id: int) -> bool:
+        """True if this message_id was already classified in a previous cycle."""
+        ...
+
+    @abstractmethod
+    async def mark_message_seen(self, message_id: int, reservation_id: int) -> None:
+        """Record that this message_id has been classified."""
+        ...
+
     # -- request tracking ----------------------------------------------------
 
     @abstractmethod

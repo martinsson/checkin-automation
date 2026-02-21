@@ -17,6 +17,7 @@ Flow:
   --- owner reviews and sends manually ---
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Literal
 
@@ -26,6 +27,8 @@ from src.domain.memory import RequestMemory
 from src.domain.response import GuestAcknowledger, ReplyComposer, ResponseParser
 
 import uuid
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -68,17 +71,36 @@ class Pipeline:
         reservation_id: int,
         message: str,
         context: ConversationContext,
+        message_id: int = 0,
     ) -> PipelineResult:
         """Classify intent, generate drafts for owner review."""
 
+        log.debug("res=%d msg_id=%d message=%.60r", reservation_id, message_id, message)
+
+        # Guard: skip AI call if this exact message was already classified
+        if message_id and await self._cfg.memory.has_message_been_seen(message_id):
+            log.info("res=%d msg_id=%d skip: message already seen", reservation_id, message_id)
+            return PipelineResult(action="already_processed", details="message already seen")
+
         # Step 1: AI classifies intent
         result = await self._cfg.classifier.classify(message, context)
+
+        # Mark seen now so re-runs of the same message_id are skipped
+        if message_id:
+            await self._cfg.memory.mark_message_seen(message_id, reservation_id)
+
+        log.info(
+            "res=%d msg_id=%d classified → intent=%s conf=%.2f time=%s",
+            reservation_id, message_id, result.intent, result.confidence,
+            result.extracted_time or "?",
+        )
 
         if result.intent == "other":
             return PipelineResult(action="ignored", details=f"confidence={result.confidence:.2f}")
 
         # Step 2: check memory — don't process the same request twice
         if await self._cfg.memory.has_been_processed(reservation_id, result.intent):
+            log.info("res=%d intent=%s skip: already processed", reservation_id, result.intent)
             return PipelineResult(
                 action="already_processed",
                 details=f"intent={result.intent}",
@@ -109,9 +131,13 @@ class Pipeline:
 
         # If AI needs more info, draft a follow-up question
         if result.needs_followup and result.followup_question:
-            await self._cfg.memory.save_draft(
+            followup_draft_id = await self._cfg.memory.save_draft(
                 request_id, reservation_id, result.intent,
                 "followup", result.followup_question,
+            )
+            log.info(
+                "res=%d intent=%s followup draft=%d: %.60s",
+                reservation_id, result.intent, followup_draft_id, result.followup_question,
             )
             return PipelineResult(
                 action="followup_drafted",
@@ -121,7 +147,7 @@ class Pipeline:
 
         # Step 3: AI composes acknowledgment → saved as draft
         ack = await self._cfg.acknowledger.compose_acknowledgment(result, context)
-        await self._cfg.memory.save_draft(
+        ack_draft_id = await self._cfg.memory.save_draft(
             request_id, reservation_id, result.intent,
             "acknowledgment", ack.body,
         )
@@ -146,13 +172,17 @@ class Pipeline:
             ),
             message=message,
         )
-        await self._cfg.memory.save_draft(
+        query_draft_id = await self._cfg.memory.save_draft(
             request_id, reservation_id, result.intent,
             "cleaner_query", query.message,
         )
 
         await self._cfg.memory.update_status(request_id, "pending_acknowledgment")
 
+        log.info(
+            "res=%d intent=%s drafts created: ack=%d cleaner_query=%d",
+            reservation_id, result.intent, ack_draft_id, query_draft_id,
+        )
         return PipelineResult(
             action="drafts_created",
             details=f"acknowledgment + cleaner_query drafted",
@@ -190,15 +220,22 @@ class Pipeline:
         # AI parses cleaner's reply
         parsed = await self._cfg.parser.parse(response.raw_text, stub_query)
 
+        log.info("cleaner response req=%s parsed → %s", response.request_id, parsed.answer)
+
         # AI composes guest reply
         reply = await self._cfg.composer.compose(parsed, stub_query)
 
         # Save as draft for owner review
         reservation_id = req.reservation_id if req else 0
         intent = req.intent if req else "early_checkin"
-        await self._cfg.memory.save_draft(
+        reply_draft_id = await self._cfg.memory.save_draft(
             response.request_id, reservation_id, intent,
             "guest_reply", reply.body,
+        )
+
+        log.info(
+            "cleaner response req=%s guest reply draft=%d: %.60s",
+            response.request_id, reply_draft_id, reply.body,
         )
 
         if req:

@@ -69,10 +69,11 @@ async def poll_once(
                 reservation_id=res.reservation_id,
                 message=latest.body,
                 context=context,
+                message_id=latest.message_id,
             )
             if result.action not in ("ignored", "already_processed"):
-                log.info(
-                    "Reservation %d → %s: %s",
+                log.debug(
+                    "res=%d action=%s: %s",
                     res.reservation_id,
                     result.action,
                     result.details[:60],

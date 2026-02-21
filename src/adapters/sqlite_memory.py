@@ -10,6 +10,12 @@ from datetime import datetime, timezone
 from src.domain.memory import Draft, ProcessedRequest, RequestMemory
 
 _SCHEMA = """
+CREATE TABLE IF NOT EXISTS seen_messages (
+    message_id     INTEGER PRIMARY KEY,
+    reservation_id INTEGER NOT NULL,
+    seen_at        TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS requests (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     reservation_id INTEGER NOT NULL,
@@ -55,6 +61,22 @@ class SqliteRequestMemory(RequestMemory):
         self._conn = sqlite3.connect(db_path)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(_SCHEMA)
+
+    # -- message-level dedup -------------------------------------------------
+
+    async def has_message_been_seen(self, message_id: int) -> bool:
+        row = self._conn.execute(
+            "SELECT 1 FROM seen_messages WHERE message_id = ?", (message_id,)
+        ).fetchone()
+        return row is not None
+
+    async def mark_message_seen(self, message_id: int, reservation_id: int) -> None:
+        self._conn.execute(
+            "INSERT OR IGNORE INTO seen_messages (message_id, reservation_id, seen_at)"
+            " VALUES (?, ?, ?)",
+            (message_id, reservation_id, _now()),
+        )
+        self._conn.commit()
 
     # -- request tracking ----------------------------------------------------
 

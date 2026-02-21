@@ -13,6 +13,26 @@ class RequestMemoryContract(ABC):
     def create_memory(self) -> RequestMemory:
         ...
 
+    # -- message-level dedup -------------------------------------------------
+
+    @pytest.mark.asyncio
+    async def test_message_not_seen_by_default(self):
+        mem = self.create_memory()
+        assert await mem.has_message_been_seen(999) is False
+
+    @pytest.mark.asyncio
+    async def test_mark_and_check_message_seen(self):
+        mem = self.create_memory()
+        await mem.mark_message_seen(42, 101)
+        assert await mem.has_message_been_seen(42) is True
+
+    @pytest.mark.asyncio
+    async def test_mark_message_seen_is_idempotent(self):
+        mem = self.create_memory()
+        await mem.mark_message_seen(42, 101)
+        await mem.mark_message_seen(42, 101)  # must not raise
+        assert await mem.has_message_been_seen(42) is True
+
     # -- request tracking ----------------------------------------------------
 
     @pytest.mark.asyncio

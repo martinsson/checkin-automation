@@ -69,6 +69,7 @@ async def test_other_intent_is_ignored(pipeline):
         RESERVATION_ID,
         "Bonjour, quel est le code Wifi ?",
         _ctx(),
+        message_id=10,
     )
     assert result.action == "ignored"
 
@@ -79,6 +80,7 @@ async def test_early_checkin_creates_drafts(pipeline, memory):
         RESERVATION_ID,
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement, vers 12h ?",
         _ctx(),
+        message_id=20,
     )
     assert result.action == "drafts_created"
     assert result.request_id
@@ -103,8 +105,8 @@ async def test_early_checkin_creates_drafts(pipeline, memory):
 @pytest.mark.asyncio
 async def test_same_intent_not_processed_twice(pipeline):
     msg = "J'aimerais arriver avant 15h, vers 12h si possible."
-    await pipeline.process_message(RESERVATION_ID, msg, _ctx())
-    result2 = await pipeline.process_message(RESERVATION_ID, msg, _ctx())
+    await pipeline.process_message(RESERVATION_ID, msg, _ctx(), message_id=30)
+    result2 = await pipeline.process_message(RESERVATION_ID, msg, _ctx(), message_id=31)
     assert result2.action == "already_processed"
 
 
@@ -114,11 +116,13 @@ async def test_early_and_late_are_independent(pipeline, memory):
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
+        message_id=40,
     )
     r2 = await pipeline.process_message(
         RESERVATION_ID,
         "Puis-je partir tard le dernier jour, vers 13h ?",
         _ctx(),
+        message_id=41,
     )
     assert r1.action == "drafts_created"
     assert r2.action == "drafts_created"
@@ -134,6 +138,7 @@ async def test_missing_time_drafts_followup(pipeline, memory):
         RESERVATION_ID,
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement ?",
         _ctx(),
+        message_id=50,
     )
     assert result.action == "followup_drafted"
 
@@ -157,6 +162,7 @@ async def test_cleaner_yes_creates_reply_draft(pipeline, memory, cleaner):
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
+        message_id=60,
     )
 
     # Simulate cleaner responding yes
@@ -179,6 +185,7 @@ async def test_cleaner_unclear_creates_reply_draft(pipeline, memory, cleaner):
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
+        message_id=70,
     )
 
     cleaner.simulate_response(result.request_id, "Je verrai...")
@@ -200,6 +207,7 @@ async def test_owner_can_approve_draft(pipeline, memory):
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
+        message_id=80,
     )
 
     drafts = await memory.get_pending_drafts()
@@ -219,6 +227,7 @@ async def test_owner_can_reject_with_correction(pipeline, memory):
         RESERVATION_ID,
         "Puis-je arriver avant 15h, vers 12h ?",
         _ctx(),
+        message_id=90,
     )
 
     drafts = await memory.get_pending_drafts()
@@ -235,3 +244,38 @@ async def test_owner_can_reject_with_correction(pipeline, memory):
     assert reviewed.verdict == "nok"
     assert reviewed.actual_message_sent == "My own version of the message"
     assert reviewed.owner_comment == "Too formal for this guest"
+
+
+# ---------------------------------------------------------------------------
+# Message-level dedup
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_same_message_id_not_classified_twice(memory):
+    """Same message_id on two calls → second call skips AI and returns already_processed."""
+    classify_calls = []
+
+    class CountingClassifier(SimulatorIntentClassifier):
+        async def classify(self, message, context):
+            classify_calls.append(message)
+            return await super().classify(message, context)
+
+    cfg = PipelineConfig(
+        cleaner=ConsoleCleanerNotifier(),
+        classifier=CountingClassifier(),
+        acknowledger=SimulatorGuestAcknowledger(),
+        parser=SimulatorResponseParser(),
+        composer=SimulatorReplyComposer(),
+        memory=memory,
+    )
+    p = Pipeline(cfg)
+
+    msg = "Puis-je arriver avant 15h, vers 12h ?"
+    r1 = await p.process_message(RESERVATION_ID, msg, _ctx(), message_id=100)
+    r2 = await p.process_message(RESERVATION_ID, msg, _ctx(), message_id=100)
+
+    assert r1.action == "drafts_created"
+    assert r2.action == "already_processed"
+    assert r2.details == "message already seen"
+    assert len(classify_calls) == 1  # classifier called only once

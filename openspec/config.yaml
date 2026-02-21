@@ -1,20 +1,23 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Project: checking-automation
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Business intent:
+  1. Always respond to guest messages in near-real-time. A message at midnight
+     must get an acknowledgment quickly, not when the host wakes up.
+  2. Automate the three-way conversation between guest, host, and cleaner.
+     The system orchestrates: acknowledge guest → ask cleaner → relay answer.
+     The host approves drafts and handles exceptions; the system handles routine.
+
+  Core invariants:
+  - Draft-first as validation — outgoing messages are saved as drafts for owner review;
+    this is a temporary mechanism to build confidence in the AI, not a permanent constraint
+  - Idempotency keyed on (reservation_id, intent) — never process the same request twice
+  - AI classifies + drafts; code enforces business rules
+
+  Tech stack: Python 3.11+, asyncio, Claude API (anthropic SDK), SQLite,
+  port/adapter architecture (ABC ports, simulator adapters for tests), pytest-asyncio.
+
+  External APIs:
+  - Smoobu: https://docs.smoobu.com/#introduction (guest messaging, reservations)
