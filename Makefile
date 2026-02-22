@@ -1,4 +1,4 @@
-.PHONY: test test-integration run review review-ui fetch-threads build deploy
+.PHONY: test test-integration run review review-ui fetch-threads deploy
 
 # Database path (override with: make review DB_PATH=/path/to/checkin.db)
 DB_PATH ?= data/checkin.db
@@ -7,8 +7,6 @@ DB_PATH ?= data/checkin.db
 #   make deploy SERVER=root@1.2.3.4
 SERVER    ?= hetzner
 REMOTE_DIR := /opt/checkin-automation
-
-IMAGES := checkin-daemon checkin-web
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -71,22 +69,28 @@ fetch-threads:
 # Build & Deploy to Hetzner
 #
 # Workflow:
-#   make build    — build Docker images locally
-#   make deploy   — push images to server over SSH, restart services
+#   make deploy   — rsync source to server, build there, restart services
+#
+# Both services use the same image (same Dockerfile, different command).
+# Building on the server avoids transferring 400MB+ images over SSH; the
+# server's layer cache makes rebuilds fast after the first one.
 #
 # First-time server setup (manual, once):
 #   ssh $(SERVER) 'mkdir -p $(REMOTE_DIR)'
 #   scp .env $(SERVER):$(REMOTE_DIR)/.env
+#
+# The .env file is NEVER baked into the Docker image (.dockerignore excludes it).
+# It lives only on the server and is read by docker-compose at container startup.
+# To update secrets: scp .env $(SERVER):$(REMOTE_DIR)/.env && make deploy
 # ---------------------------------------------------------------------------
 
-build:
-	docker compose build
-
 deploy:
-	@echo "→ Syncing docker-compose.yml to $(SERVER):$(REMOTE_DIR)/"
-	rsync -av docker-compose.yml $(SERVER):$(REMOTE_DIR)/
-	@echo "→ Pushing images ($(IMAGES)) to $(SERVER)"
-	docker save $(IMAGES) | ssh $(SERVER) docker load
+	@echo "→ Syncing source to $(SERVER):$(REMOTE_DIR)/"
+	rsync -av --exclude='.env' --exclude='data/' --exclude='venv/' \
+	    --exclude='__pycache__' --exclude='.git/' \
+	    ./ $(SERVER):$(REMOTE_DIR)/
+	@echo "→ Building images on server"
+	ssh $(SERVER) 'cd $(REMOTE_DIR) && docker compose build'
 	@echo "→ Restarting services"
 	ssh $(SERVER) 'cd $(REMOTE_DIR) && docker compose up -d'
 	@echo "→ Service status"
