@@ -37,6 +37,16 @@ Guest message (Smoobu)
   - `GET  /reservations/{id}/messages` — fetch message thread
   - `POST /reservations/{id}/messages/send-message-to-guest` — send to guest
 
+### Testing strategy
+
+Every port has:
+1. An **abstract contract test** (defines behavior)
+2. A **simulator** (in-memory, deterministic, fast)
+3. A **real adapter** (integration test, skipped without credentials)
+
+The orchestrator is tested with all simulators — no network, no credentials, no AI API calls. Fast and deterministic.
+
+
 ## Tech Stack
 
 - Python 3.11+, async/await throughout
