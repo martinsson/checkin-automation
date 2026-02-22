@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in — Checking{% endblock %}
+
+{% block content %}
+<div style="padding: 1rem;">
+  <div class="login-wrap">
+    <h2>Checking</h2>
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/login">
+      <input type="password" name="token" placeholder="Review token" autocomplete="current-password" autofocus>
+      <button type="submit" class="btn btn-login">Sign in</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Draft #{{ draft.draft_id }} — Checking{% endblock %}
+
+{% block content %}
+<div class="header">
+  <h1>Draft #{{ draft.draft_id }}</h1>
+</div>
+
+<div class="container">
+  <a href="/" class="back-link">← All drafts</a>
+
+  <div class="card">
+    <div class="card-meta">
+      Res #{{ draft.reservation_id }} &middot; {{ draft.step }} &middot; {{ draft.intent }}
+    </div>
+
+    {% if req %}
+    <div class="section-label">Guest message</div>
+    <div class="message-box">{{ req.guest_message }}</div>
+    {% endif %}
+
+    <div class="section-label">AI draft</div>
+    <div class="draft-box">{{ draft.draft_body }}</div>
+
+    {% if draft.verdict == "pending" %}
+    <form method="post" action="/drafts/{{ draft.draft_id }}/approve">
+      <button type="submit" class="btn btn-approve">✓ Approve &amp; send</button>
+    </form>
+
+    <form method="post" action="/drafts/{{ draft.draft_id }}/reject">
+      <button type="submit" class="btn btn-reject">✗ Reject</button>
+      <div class="reject-form">
+        <label for="actual">What did you actually send? <span style="font-weight:400;color:#aaa">(optional)</span></label>
+        <textarea id="actual" name="actual_message_sent" rows="3" placeholder="Leave empty if you didn't send anything different"></textarea>
+        <label for="comment">Why did you change it? <span style="font-weight:400;color:#aaa">(optional)</span></label>
+        <textarea id="comment" name="owner_comment" rows="2" placeholder="Brief note for your records"></textarea>
+      </div>
+    </form>
+    {% else %}
+    <div class="error" style="background:#f0fdf4;color:#16a34a;">
+      Already reviewed: <strong>{{ draft.verdict }}</strong>
+      {% if draft.reviewed_at %} on {{ draft.reviewed_at }}{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
