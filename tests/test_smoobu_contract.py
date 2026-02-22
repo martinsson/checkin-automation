@@ -1,78 +1,82 @@
 """
-Adapter contract tests for SmoobuGateway — both simulator and real.
+Adapter contract tests for SmoobuGateway.
 
-The same contract is verified against:
+The same contract (SmoobuGatewayContract) is run against every implementation:
   - SimulatorSmoobuGateway  (always runs, no credentials needed)
-  - SmoobuClient            (skipped if SMOOBU_API_KEY is not set)
+  - SmoobuClient            (skipped when SMOOBU_API_KEY is not set)
+
+Each subclass provides create_gateway() returning a ready-to-use instance.
+The simulator is pre-seeded so every contract test passes without skips.
 """
 
 import os
+from datetime import date, timedelta
 
 import pytest
 
+from src.adapters.ports import ActiveReservation
 from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
 from src.adapters.smoobu_client import SmoobuClient
-
 from tests.contracts.smoobu_gateway_contract import SmoobuGatewayContract
+
+
+def _future_res(reservation_id: int, days_ahead: int = 3) -> ActiveReservation:
+    arrival = (date.today() + timedelta(days=days_ahead)).isoformat()
+    departure = (date.today() + timedelta(days=days_ahead + 4)).isoformat()
+    return ActiveReservation(
+        reservation_id=reservation_id,
+        guest_name=f"Guest {reservation_id}",
+        arrival=arrival,
+        departure=departure,
+        apartment_id=42,
+    )
+
 
 # ---------------------------------------------------------------------------
 # Simulator — always runs
 # ---------------------------------------------------------------------------
 
-
 class TestSimulatorSmoobuContract(SmoobuGatewayContract):
+    """
+    Pre-seed two reservations with messages so every contract test passes.
+    Reservation 101 is the primary test target; 102 ensures ordering tests
+    have at least two threads to compare.
+    """
 
     def create_gateway(self):
-        return SimulatorSmoobuGateway()
+        gw = SimulatorSmoobuGateway()
+        gw.inject_active_reservation(_future_res(101, days_ahead=2))
+        gw.inject_active_reservation(_future_res(102, days_ahead=3))
+        gw.inject_guest_message(101, "Hi", "Can we check in early?")
+        gw.inject_guest_message(102, "Hi", "What time is check-out?")
+        return gw
 
     def get_test_reservation_id(self):
-        return 12345
-
-    # These require pre-seeded threads; covered by TestSimulatorThreadsContract.
-    def test_get_threads_non_empty(self):
-        pytest.skip("Simulator starts empty; covered by TestSimulatorThreadsContract")
-
-    def test_get_threads_timestamps_are_timezone_aware(self):
-        pytest.skip("Simulator starts empty; covered by TestSimulatorThreadsContract")
+        return 101
 
     def test_injected_reservation_returned_within_range(self):
-        from src.adapters.ports import ActiveReservation
-        gw = SimulatorSmoobuGateway()
-        gw.inject_active_reservation(ActiveReservation(
-            reservation_id=1,
-            guest_name="Alice",
-            arrival="2026-06-01",
-            departure="2026-06-05",
-            apartment_id=42,
-        ))
-        result = gw.get_active_reservations(42, "2026-05-31", "2026-06-02")
-        assert len(result) == 1
-        assert result[0].guest_name == "Alice"
+        gw = self.create_gateway()
+        result = gw.get_active_reservations(42, date.today().isoformat(),
+                                            (date.today() + timedelta(days=10)).isoformat())
+        assert any(r.reservation_id == 101 for r in result)
 
     def test_reservation_outside_range_not_returned(self):
-        from src.adapters.ports import ActiveReservation
         gw = SimulatorSmoobuGateway()
-        gw.inject_active_reservation(ActiveReservation(
-            reservation_id=1,
-            guest_name="Alice",
-            arrival="2026-06-10",
-            departure="2026-06-12",
-            apartment_id=42,
-        ))
-        result = gw.get_active_reservations(42, "2026-06-01", "2026-06-05")
+        gw.inject_active_reservation(_future_res(1, days_ahead=10))
+        result = gw.get_active_reservations(42, date.today().isoformat(),
+                                            (date.today() + timedelta(days=5)).isoformat())
         assert result == []
 
     def test_reservation_wrong_apartment_not_returned(self):
-        from src.adapters.ports import ActiveReservation
         gw = SimulatorSmoobuGateway()
         gw.inject_active_reservation(ActiveReservation(
-            reservation_id=1,
-            guest_name="Alice",
-            arrival="2026-06-01",
-            departure="2026-06-05",
+            reservation_id=1, guest_name="Alice",
+            arrival=date.today().isoformat(),
+            departure=(date.today() + timedelta(days=3)).isoformat(),
             apartment_id=99,
         ))
-        result = gw.get_active_reservations(42, "2026-05-31", "2026-06-02")
+        result = gw.get_active_reservations(42, date.today().isoformat(),
+                                            (date.today() + timedelta(days=5)).isoformat())
         assert result == []
 
 
@@ -82,14 +86,10 @@ class TestSimulatorSmoobuContract(SmoobuGatewayContract):
 
 API_KEY = os.environ.get("SMOOBU_API_KEY", "")
 BOOKING_ID = os.environ.get("TEST_BOOKING_ID", "")
-
 CREDS_AVAILABLE = bool(API_KEY) and bool(BOOKING_ID)
 
 
-@pytest.mark.skipif(
-    not CREDS_AVAILABLE,
-    reason="SMOOBU_API_KEY or TEST_BOOKING_ID not set",
-)
+@pytest.mark.skipif(not CREDS_AVAILABLE, reason="SMOOBU_API_KEY or TEST_BOOKING_ID not set")
 class TestSmoobuClientContract(SmoobuGatewayContract):
 
     def create_gateway(self):
