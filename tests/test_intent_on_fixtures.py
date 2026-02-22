@@ -133,6 +133,11 @@ CLAUDE_GOLDEN = [
         "Bonsoir. Nous arriverons un peu plus tôt (vers 16h). L'appartement sera-t-il accessible avec les codes d'accès ?",
         "early_checkin",
     ),
+    # Edge case they are talking about time, but not actually asking for an early checkin.
+    {
+        "Hi! We are 4 uni students attending UCL in London coming to visit our other friend who is on his study year abroad at the uni in Grenoble, so this is a great location for us to stay in. We're arriving at GNB at 11:10 on the 6th, but we'll probably see our friend first before the check-in at 17:00. We'll be ready to leave before 11:00 on the 8th as our flight will be at 15:50. We're very clean people and won't make much noise!"
+        "other"
+    }
 ]
 
 

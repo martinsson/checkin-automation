@@ -36,8 +36,11 @@ test-integration:
 #           DB_PATH (default data/checkin.db)
 # ---------------------------------------------------------------------------
 
+LOG_FILE ?= data/logs/daemon.log
+
 run:
-	set -a && source .env && set +a && python scripts/run.py
+	mkdir -p data/logs
+	set -a && source .env && set +a && venv/bin/python scripts/run.py 2>&1 | tee -a $(LOG_FILE)
 
 # ---------------------------------------------------------------------------
 # Review drafts

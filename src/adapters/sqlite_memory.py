@@ -9,6 +9,14 @@ from datetime import datetime, timezone
 
 from src.domain.memory import Draft, ProcessedRequest, RequestMemory
 
+_MIGRATIONS = [
+    "ALTER TABLE requests ADD COLUMN guest_name TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE requests ADD COLUMN property_name TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE requests ADD COLUMN original_time TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE requests ADD COLUMN requested_time TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE requests ADD COLUMN relevant_date TEXT NOT NULL DEFAULT ''",
+]
+
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS seen_messages (
     message_id     INTEGER PRIMARY KEY,
@@ -61,6 +69,12 @@ class SqliteRequestMemory(RequestMemory):
         self._conn = sqlite3.connect(db_path)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(_SCHEMA)
+        for migration in _MIGRATIONS:
+            try:
+                self._conn.execute(migration)
+                self._conn.commit()
+            except sqlite3.OperationalError:
+                pass  # column already exists
 
     # -- message-level dedup -------------------------------------------------
 
