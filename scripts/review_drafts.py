@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from src.adapters.sqlite_memory import SqliteRequestMemory
 
-DB_PATH = "checkin.db"
+DB_PATH = os.getenv("DB_PATH", "data/checkin.db")
 
 
 def _wrap(text: str, width: int = 72, indent: str = "    ") -> str:
@@ -32,11 +32,11 @@ async def list_pending(mem: SqliteRequestMemory) -> None:
         print("No pending drafts.")
         return
 
-    print(f"\n{'ID':>4}  {'Step':<16}  {'Intent':<16}  {'Res.ID':>6}  Preview")
-    print("-" * 80)
     for d in drafts:
-        preview = d.draft_body[:50].replace("\n", " ")
-        print(f"{d.draft_id:>4}  {d.step:<16}  {d.intent:<16}  {d.reservation_id:>6}  {preview}...")
+        print(f"\n{'─' * 72}")
+        print(f"  #{d.draft_id}  {d.step}  |  {d.intent}  |  reservation {d.reservation_id}")
+        print(f"{'─' * 72}")
+        print(d.draft_body)
     print()
 
 
