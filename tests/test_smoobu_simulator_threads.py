@@ -17,7 +17,10 @@ from tests.contracts.smoobu_gateway_contract import SmoobuGatewayContract
 class TestSimulatorThreadsContract(SmoobuGatewayContract):
 
     def create_gateway(self):
-        return SimulatorSmoobuGateway()
+        gw = SimulatorSmoobuGateway()
+        gw.inject_active_reservation(_future_res(12345))
+        gw.inject_guest_message(12345, "Hi", "Can we check in early?")
+        return gw
 
     def get_test_reservation_id(self):
         return 12345

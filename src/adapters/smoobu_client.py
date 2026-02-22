@@ -86,10 +86,12 @@ class SmoobuClient(SmoobuGateway):
         data = resp.json()
 
         threads = []
-        for item in data.get("data", []):
+        for item in data.get("threads", []):
             latest_raw = item.get("latest_message", {}).get("created_at", "")
             try:
                 latest_at = datetime.fromisoformat(latest_raw.replace("Z", "+00:00"))
+                if latest_at.tzinfo is None:
+                    latest_at = latest_at.replace(tzinfo=timezone.utc)
             except (ValueError, AttributeError):
                 latest_at = datetime.now(timezone.utc)
 

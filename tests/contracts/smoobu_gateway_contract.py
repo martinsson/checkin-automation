@@ -76,6 +76,30 @@ class SmoobuGatewayContract(ABC):
         assert isinstance(page.threads, list)
         assert isinstance(page.has_more, bool)
 
+    def test_get_threads_non_empty(self):
+        """The gateway must return at least one thread when data exists.
+
+        This test guards against field-mapping bugs (e.g. reading the wrong
+        JSON key) that would silently produce an empty list.
+        """
+        gw = self.create_gateway()
+        page = gw.get_threads(page_number=1)
+        assert len(page.threads) > 0, (
+            "Expected at least one thread — "
+            "check that the response envelope key is mapped correctly"
+        )
+
+    def test_get_threads_timestamps_are_timezone_aware(self):
+        """latest_message_at must be timezone-aware so cutoff comparisons don't crash."""
+        from datetime import timezone
+        gw = self.create_gateway()
+        page = gw.get_threads(page_number=1)
+        for thread in page.threads:
+            assert thread.latest_message_at.tzinfo is not None, (
+                f"Thread {thread.reservation_id} has a naive latest_message_at; "
+                "comparing it to a UTC cutoff will raise TypeError"
+            )
+
     def test_get_threads_sorted_by_recency(self):
         """Threads must be sorted most-recently-active first."""
         gw = self.create_gateway()

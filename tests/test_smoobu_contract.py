@@ -28,6 +28,13 @@ class TestSimulatorSmoobuContract(SmoobuGatewayContract):
     def get_test_reservation_id(self):
         return 12345
 
+    # These require pre-seeded threads; covered by TestSimulatorThreadsContract.
+    def test_get_threads_non_empty(self):
+        pytest.skip("Simulator starts empty; covered by TestSimulatorThreadsContract")
+
+    def test_get_threads_timestamps_are_timezone_aware(self):
+        pytest.skip("Simulator starts empty; covered by TestSimulatorThreadsContract")
+
     def test_injected_reservation_returned_within_range(self):
         from src.adapters.ports import ActiveReservation
         gw = SimulatorSmoobuGateway()
