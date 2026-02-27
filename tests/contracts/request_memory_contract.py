@@ -151,3 +151,55 @@ class RequestMemoryContract(ABC):
         assert draft.actual_message_sent == "What I actually sent"
         assert draft.owner_comment == "Tone was too formal"
         assert draft.reviewed_at is not None
+
+    # -- sent_at / dispatch support -------------------------------------------
+
+    @pytest.mark.asyncio
+    async def test_new_draft_has_sent_at_none(self):
+        mem = self.create_memory()
+        await mem.save_request(42, "early_checkin", "req-1", "msg")
+        draft_id = await mem.save_draft("req-1", 42, "early_checkin", "acknowledgment", "Hi")
+        draft = await mem.get_draft(draft_id)
+        assert draft.sent_at is None
+
+    @pytest.mark.asyncio
+    async def test_get_reviewed_unsent_drafts(self):
+        mem = self.create_memory()
+        await mem.save_request(42, "early_checkin", "req-1", "msg")
+
+        # pending draft — should NOT appear
+        await mem.save_draft("req-1", 42, "early_checkin", "acknowledgment", "Draft pending")
+
+        # reviewed ok, unsent — SHOULD appear
+        d_ok = await mem.save_draft("req-1", 42, "early_checkin", "cleaner_query", "Draft ok")
+        await mem.review_draft(d_ok, "ok")
+
+        # reviewed nok, unsent — SHOULD appear
+        d_nok = await mem.save_draft("req-1", 42, "early_checkin", "guest_reply", "Draft nok")
+        await mem.review_draft(d_nok, "nok", actual_message_sent="Fixed text")
+
+        # reviewed ok, already sent — should NOT appear
+        d_sent = await mem.save_draft("req-1", 42, "early_checkin", "followup", "Draft sent")
+        await mem.review_draft(d_sent, "ok")
+        await mem.mark_draft_sent(d_sent)
+
+        unsent = await mem.get_reviewed_unsent_drafts()
+        ids = [d.draft_id for d in unsent]
+        assert d_ok in ids
+        assert d_nok in ids
+        assert len(unsent) == 2
+
+    @pytest.mark.asyncio
+    async def test_mark_draft_sent(self):
+        mem = self.create_memory()
+        await mem.save_request(42, "early_checkin", "req-1", "msg")
+        draft_id = await mem.save_draft("req-1", 42, "early_checkin", "acknowledgment", "Hi")
+        await mem.review_draft(draft_id, "ok")
+
+        await mem.mark_draft_sent(draft_id)
+
+        draft = await mem.get_draft(draft_id)
+        assert draft.sent_at is not None
+        # no longer appears in unsent
+        unsent = await mem.get_reviewed_unsent_drafts()
+        assert all(d.draft_id != draft_id for d in unsent)

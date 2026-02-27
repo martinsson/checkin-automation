@@ -9,7 +9,9 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 from src.adapters.ports import ReservationInfo, SmoobuGateway
+from src.communication.ports import CleanerNotifier, CleanerQuery
 from src.domain.intent import ConversationContext
+from src.domain.memory import RequestMemory
 from src.domain.reservation_cache import ReservationCache
 from src.pipeline import Pipeline
 
@@ -21,6 +23,8 @@ async def poll_once(
     smoobu: SmoobuGateway,
     reservation_cache: ReservationCache,
     threads_cutoff_days: int = 7,
+    cleaner: CleanerNotifier | None = None,
+    cleaner_name: str = "Marie",
 ) -> None:
     """
     One poll cycle using threads as the activity index.
@@ -124,6 +128,68 @@ async def poll_once(
             log.info("Cleaner response processed → %s: %s", r.action, r.details[:60])
     except Exception as exc:
         log.error("Failed to process cleaner responses: %s", exc)
+
+    # Dispatch reviewed drafts
+    if cleaner is not None:
+        try:
+            await dispatch_reviewed_drafts(
+                memory=pipeline._cfg.memory,
+                smoobu=smoobu,
+                cleaner=cleaner,
+                cleaner_name=cleaner_name,
+            )
+        except Exception as exc:
+            log.error("Failed to dispatch reviewed drafts: %s", exc)
+
+
+_GUEST_STEPS = {"acknowledgment", "followup", "guest_reply"}
+
+
+async def dispatch_reviewed_drafts(
+    memory: RequestMemory,
+    smoobu: SmoobuGateway,
+    cleaner: CleanerNotifier,
+    cleaner_name: str = "Marie",
+) -> None:
+    """Send reviewed drafts via the appropriate channel."""
+    drafts = await memory.get_reviewed_unsent_drafts()
+    for draft in drafts:
+        try:
+            if draft.verdict == "nok" and draft.actual_message_sent is None:
+                # Rejected without correction — skip sending, mark sent
+                await memory.mark_draft_sent(draft.draft_id)
+                log.info("draft=%d: nok without correction — skipped", draft.draft_id)
+                continue
+
+            body: str = draft.draft_body if draft.verdict == "ok" else draft.actual_message_sent  # type: ignore[assignment]
+
+            if draft.step in _GUEST_STEPS:
+                smoobu.send_message(draft.reservation_id, "", body)
+            elif draft.step == "cleaner_query":
+                request = await memory.get_request(draft.request_id)
+                if request is None:
+                    log.error("draft=%d: request %s not found — skipping", draft.draft_id, draft.request_id)
+                    continue
+                query = CleanerQuery(
+                    request_id=draft.request_id,
+                    cleaner_name=cleaner_name,
+                    guest_name=request.guest_name,
+                    property_name=request.property_name,
+                    request_type=draft.intent,
+                    original_time=request.original_time,
+                    requested_time=request.requested_time,
+                    date=request.relevant_date,
+                    message=body,
+                )
+                await cleaner.send_query(query)
+
+            await memory.mark_draft_sent(draft.draft_id)
+            log.info("draft=%d: sent via %s for res=%d", draft.draft_id, draft.step, draft.reservation_id)
+        except Exception as exc:
+            log.error(
+                "draft=%d res=%d: dispatch failed: %s",
+                draft.draft_id, draft.reservation_id, exc,
+            )
 
 
 def _get_reservation(

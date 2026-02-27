@@ -40,6 +40,7 @@ class Draft:
     owner_comment: str | None         # why they changed it
     created_at: datetime
     reviewed_at: datetime | None
+    sent_at: datetime | None = None
 
 
 class RequestMemory(ABC):
@@ -139,4 +140,14 @@ class RequestMemory(ABC):
         actual_message_sent: what the owner actually sent (if different from draft)
         owner_comment: why the owner changed it (learning data for prompts)
         """
+        ...
+
+    @abstractmethod
+    async def get_reviewed_unsent_drafts(self) -> list[Draft]:
+        """Return drafts where verdict IN ('ok','nok') AND sent_at IS NULL, ordered by created_at."""
+        ...
+
+    @abstractmethod
+    async def mark_draft_sent(self, draft_id: int) -> None:
+        """Set sent_at to current UTC timestamp for the given draft."""
         ...

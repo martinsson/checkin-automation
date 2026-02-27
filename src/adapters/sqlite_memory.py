@@ -15,6 +15,7 @@ _MIGRATIONS = [
     "ALTER TABLE requests ADD COLUMN original_time TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE requests ADD COLUMN requested_time TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE requests ADD COLUMN relevant_date TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE drafts ADD COLUMN sent_at TEXT",
 ]
 
 _SCHEMA = """
@@ -50,7 +51,8 @@ CREATE TABLE IF NOT EXISTS drafts (
     actual_message_sent TEXT,
     owner_comment TEXT,
     created_at  TEXT NOT NULL,
-    reviewed_at TEXT
+    reviewed_at TEXT,
+    sent_at     TEXT
 );
 """
 
@@ -208,6 +210,20 @@ class SqliteRequestMemory(RequestMemory):
         )
         self._conn.commit()
 
+    async def get_reviewed_unsent_drafts(self) -> list[Draft]:
+        rows = self._conn.execute(
+            "SELECT * FROM drafts WHERE verdict IN ('ok', 'nok') AND sent_at IS NULL"
+            " ORDER BY created_at"
+        ).fetchall()
+        return [self._row_to_draft(r) for r in rows]
+
+    async def mark_draft_sent(self, draft_id: int) -> None:
+        self._conn.execute(
+            "UPDATE drafts SET sent_at = ? WHERE id = ?",
+            (_now(), draft_id),
+        )
+        self._conn.commit()
+
     @staticmethod
     def _row_to_draft(row) -> Draft:
         return Draft(
@@ -222,4 +238,5 @@ class SqliteRequestMemory(RequestMemory):
             owner_comment=row["owner_comment"],
             created_at=_parse_dt(row["created_at"]),
             reviewed_at=_parse_dt(row["reviewed_at"]) if row["reviewed_at"] else None,
+            sent_at=_parse_dt(row["sent_at"]) if row["sent_at"] else None,
         )

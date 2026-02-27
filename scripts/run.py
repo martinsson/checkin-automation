@@ -59,7 +59,7 @@ def build_pipeline() -> Pipeline:
     db_path = os.environ.get("DB_PATH", "data/checkin.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-    cleaner_name = os.environ.get("CLEANER_NAME", "Marie")
+    cleaner_name = os.environ.get("CLEANER_NAME", "Virginie")
     config = PipelineConfig(
         cleaner=create_cleaner_notifier(),
         classifier=ClaudeIntentClassifier(api_key=api_key),
@@ -92,7 +92,11 @@ async def main() -> None:
     )
 
     while True:
-        await poll_once(pipeline, smoobu, reservation_cache, threads_cutoff_days)
+        await poll_once(
+            pipeline, smoobu, reservation_cache, threads_cutoff_days,
+            cleaner=pipeline._cfg.cleaner,
+            cleaner_name=pipeline._cfg.cleaner_name,
+        )
         log.info("Sleeping %ds …", poll_interval)
         await asyncio.sleep(poll_interval)
 
