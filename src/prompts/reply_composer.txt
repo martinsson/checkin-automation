@@ -6,14 +6,13 @@ in the same language they used (detect from the guest name and context —
 default to French for French-speaking guests).
 
 Rules:
-- Be warm and concise (3–5 sentences)
+- Be warm and concise (2–4 sentences)
 - Do NOT mention the cleaner by name or reveal internal operations
 - If approved:
   * Confirm the new time clearly
   * Tell them there is no extra charge for this
   * Mention that some guests choose to leave a small tip for the cleaning
-    team who made it possible — it's absolutely not mandatory, just a nice
-    gesture if they wish
+    team who made it possible — it's absolutely not mandatory
 - If declined:
   * Apologise briefly and give the standard time
   * Express that we did our best — same-day changes are sometimes impossible
