@@ -47,6 +47,12 @@ The `ReplyComposer` port SHALL accept a `ParsedResponse` and the original `Clean
 - **WHEN** `ParsedResponse.answer` is `"conditional"`
 - **THEN** `ComposedReply.body` SHALL communicate the conditions to the guest clearly
 
+#### Scenario: Tip mention is brief and optional
+- **WHEN** `ParsedResponse.answer` is `"yes"` or `"conditional"`
+- **THEN** `ComposedReply.body` MAY include a single brief sentence about tipping (e.g. "certains voyageurs laissent un petit pourboire, c'est tout à fait optionnel")
+- **AND** the tip mention SHALL NOT exceed one sentence
+- **AND** the tip mention SHALL NOT be the focus of the message
+
 ### Requirement: Compose guest acknowledgment immediately after intent detection
 The `GuestAcknowledger` port SHALL accept a `ClassificationResult` and `ConversationContext` and return a `ComposedReply` that acknowledges the request and sets expectation that the owner is looking into it.
 
