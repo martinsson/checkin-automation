@@ -15,11 +15,17 @@ class ConsoleCleanerNotifier(CleanerNotifier):
         self._sent[query.request_id] = query
 
         print(f"\n{'=' * 60}")
-        print(f"  TO CLEANER: {query.cleaner_name}")
+        print(f"  TO: {query.cleaner_name}")
         print(f"  RE: {query.property_name} — {query.date}")
-        print(f"  REQUEST ID: {query.request_id}")
         print(f"{'=' * 60}")
+        print(f"Bonjour {query.cleaner_name},")
+        print()
+        print("Voici une nouvelle demande, dites moi ce qui est possible, "
+              "raisonnablement bien entendu.")
+        print()
         print(query.message)
+        print()
+        print(f"[REQ-{query.request_id}]")
         print(f"{'=' * 60}\n")
 
         return tracking_id

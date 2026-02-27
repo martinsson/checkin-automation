@@ -1,14 +1,19 @@
 import email as email_lib
 import email.utils
+import logging
+import os
 import re
 import smtplib
 from email.header import decode_header as _decode_header
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
 
+import anthropic
 from imapclient import IMAPClient
 
 from .ports import CleanerNotifier, CleanerQuery, CleanerResponse
+
+log = logging.getLogger(__name__)
 
 REQUEST_ID_PATTERN = re.compile(r"\[REQ-([^\]]+)\]")
 
@@ -25,6 +30,7 @@ class EmailCleanerNotifier(CleanerNotifier):
         imap_host: str,
         imap_port: int,
         cleaner_email: str,
+        anthropic_api_key: str | None = None,
     ):
         self.smtp_host = smtp_host
         self.smtp_port = smtp_port
@@ -33,11 +39,40 @@ class EmailCleanerNotifier(CleanerNotifier):
         self.imap_host = imap_host
         self.imap_port = imap_port
         self.cleaner_email = cleaner_email
+        self._anthropic = anthropic.Anthropic(
+            api_key=anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY", ""),
+        )
+
+    def _translate_to_french(self, text: str) -> str:
+        """Translate text to French using Claude. Returns original on failure."""
+        try:
+            response = self._anthropic.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=512,
+                messages=[{"role": "user", "content": (
+                    "Translate the following guest message into French. "
+                    "If it is already in French, return it as-is. "
+                    "Return ONLY the translated text, nothing else.\n\n"
+                    f"{text}"
+                )}],
+            )
+            return response.content[0].text.strip()
+        except Exception as exc:
+            log.warning("Translation failed, using original message: %s", exc)
+            return text
 
     async def send_query(self, query: CleanerQuery) -> str:
-        subject = f"[REQ-{query.request_id}] {query.property_name} — {query.date}"
+        subject = f"{query.property_name} — {query.date}"
 
-        msg = MIMEText(query.message, _charset="utf-8")
+        translated = self._translate_to_french(query.message)
+        body = (
+            f"Bonjour {query.cleaner_name},\n\n"
+            f"Voici une nouvelle demande, dites moi ce qui est possible, "
+            f"raisonnablement bien entendu.\n\n"
+            f"{translated}\n\n"
+            f"[REQ-{query.request_id}]"
+        )
+        msg = MIMEText(body, _charset="utf-8")
         msg["Subject"] = subject
         msg["From"] = self.smtp_user
         msg["To"] = self.cleaner_email
@@ -67,11 +102,16 @@ class EmailCleanerNotifier(CleanerNotifier):
                 raw_bytes = data[b"RFC822"]
                 msg = email_lib.message_from_bytes(raw_bytes)
 
-                subject = self._decode_subject(msg["Subject"] or "")
-                request_id = self._extract_request_id(subject)
+                # Try X-Request-ID header first, then body [REQ-...], then subject
+                body = self._get_body(msg)
+                request_id = msg["X-Request-ID"] or None
+                if not request_id:
+                    request_id = self._extract_request_id(body)
+                if not request_id:
+                    subject = self._decode_subject(msg["Subject"] or "")
+                    request_id = self._extract_request_id(subject)
 
                 if request_id:
-                    body = self._get_body(msg)
                     responses.append(
                         CleanerResponse(
                             request_id=request_id,

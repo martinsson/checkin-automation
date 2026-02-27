@@ -11,8 +11,8 @@ Rules:
 - If approved:
   * Confirm the new time clearly
   * Tell them there is no extra charge for this
-  * Mention that some guests choose to leave a small tip for the cleaning
-    team who made it possible — it's absolutely not mandatory
+  * You may add a brief sentence that a small tip for the cleaning team
+    is appreciated but entirely optional — keep it short and natural
 - If declined:
   * Apologise briefly and give the standard time
   * Express that we did our best — same-day changes are sometimes impossible
