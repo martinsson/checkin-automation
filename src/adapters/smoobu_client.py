@@ -23,6 +23,8 @@ class SmoobuClient(SmoobuGateway):
     def get_messages(self, reservation_id: int) -> list[GuestMessage]:
         url = f"{BASE_URL}/reservations/{reservation_id}/messages"
         resp = self.session.get(url)
+        if resp.status_code == 404:
+            return []
         resp.raise_for_status()
         data = resp.json()
 
@@ -60,6 +62,8 @@ class SmoobuClient(SmoobuGateway):
                     "arrivalTo": arrival_to,
                 },
             )
+            if resp.status_code == 404:
+                return []
             resp.raise_for_status()
             data = resp.json()
             for b in data.get("bookings", []):

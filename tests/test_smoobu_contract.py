@@ -54,6 +54,9 @@ class TestSimulatorSmoobuContract(SmoobuGatewayContract):
     def get_test_reservation_id(self):
         return 101
 
+    def get_test_apartment_id(self):
+        return 42
+
     def test_injected_reservation_returned_within_range(self):
         gw = self.create_gateway()
         result = gw.get_active_reservations(42, date.today().isoformat(),
@@ -86,10 +89,11 @@ class TestSimulatorSmoobuContract(SmoobuGatewayContract):
 
 API_KEY = os.environ.get("SMOOBU_API_KEY", "")
 BOOKING_ID = os.environ.get("TEST_BOOKING_ID", "")
-CREDS_AVAILABLE = bool(API_KEY) and bool(BOOKING_ID)
+APARTMENT_ID = os.environ.get("SMOOBU_APARTMENT_ID", "")
+CREDS_AVAILABLE = bool(API_KEY) and bool(BOOKING_ID) and bool(APARTMENT_ID)
 
 
-@pytest.mark.skipif(not CREDS_AVAILABLE, reason="SMOOBU_API_KEY or TEST_BOOKING_ID not set")
+@pytest.mark.skipif(not CREDS_AVAILABLE, reason="SMOOBU_API_KEY, TEST_BOOKING_ID, or SMOOBU_APARTMENT_ID not set")
 class TestSmoobuClientContract(SmoobuGatewayContract):
 
     def create_gateway(self):
@@ -97,3 +101,6 @@ class TestSmoobuClientContract(SmoobuGatewayContract):
 
     def get_test_reservation_id(self):
         return int(BOOKING_ID)
+
+    def get_test_apartment_id(self):
+        return int(APARTMENT_ID)

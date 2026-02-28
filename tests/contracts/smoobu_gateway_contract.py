@@ -25,6 +25,11 @@ class SmoobuGatewayContract(ABC):
         """Return a reservation ID usable for testing."""
         ...
 
+    @abstractmethod
+    def get_test_apartment_id(self) -> int:
+        """Return an apartment ID usable for testing."""
+        ...
+
     def test_get_messages_returns_list(self):
         gw = self.create_gateway()
         reservation_id = self.get_test_reservation_id()
@@ -53,9 +58,10 @@ class SmoobuGatewayContract(ABC):
 
     def test_get_active_reservations_returns_list(self):
         gw = self.create_gateway()
+        apartment_id = self.get_test_apartment_id()
         # Use a past date range — returns empty for both real and simulator
         result = gw.get_active_reservations(
-            apartment_id=999999,
+            apartment_id=apartment_id,
             arrival_from="2000-01-01",
             arrival_to="2000-01-02",
         )
@@ -63,8 +69,9 @@ class SmoobuGatewayContract(ABC):
 
     def test_get_active_reservations_empty_for_out_of_range(self):
         gw = self.create_gateway()
+        apartment_id = self.get_test_apartment_id()
         result = gw.get_active_reservations(
-            apartment_id=999999,
+            apartment_id=apartment_id,
             arrival_from="2000-01-01",
             arrival_to="2000-01-01",
         )
