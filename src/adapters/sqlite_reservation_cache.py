@@ -7,8 +7,8 @@ Use ":memory:" for tests, a file path for production.
 import sqlite3
 from datetime import datetime, timezone
 
-from src.adapters.ports import ReservationInfo
-from src.domain.reservation_cache import ReservationCache
+from src.ports.smoobu import ReservationInfo
+from src.ports.reservation_cache import ReservationCache
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS reservation_cache (

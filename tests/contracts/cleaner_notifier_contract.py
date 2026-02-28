@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from src.communication.ports import CleanerNotifier, CleanerQuery, CleanerResponse
+from src.ports.cleaner import CleanerNotifier, CleanerQuery, CleanerResponse
 
 
 class CleanerNotifierContract(ABC):

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from .ports import CleanerNotifier, CleanerQuery, CleanerResponse
+from src.ports.cleaner import CleanerNotifier, CleanerQuery, CleanerResponse
 
 
 class ConsoleCleanerNotifier(CleanerNotifier):

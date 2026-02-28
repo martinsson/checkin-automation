@@ -12,8 +12,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Literal
 
-from src.communication.ports import CleanerQuery
-from src.domain.intent import ClassificationResult, ConversationContext
+from src.ports.cleaner import CleanerQuery
+from src.ports.intent import ClassificationResult, ConversationContext
 
 
 @dataclass

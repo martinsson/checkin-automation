@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 
 import pytest
 
-from src.communication.console_notifier import ConsoleCleanerNotifier
+from src.simulators.cleaner import ConsoleCleanerNotifier
 from src.communication.email_notifier import EmailCleanerNotifier
 
 from tests.contracts.cleaner_notifier_contract import CleanerNotifierContract

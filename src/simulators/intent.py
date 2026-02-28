@@ -7,7 +7,7 @@ phrases used in real Airbnb message threads.
 
 import re
 
-from src.domain.intent import (
+from src.ports.intent import (
     ClassificationResult,
     ConversationContext,
     IntentClassifier,

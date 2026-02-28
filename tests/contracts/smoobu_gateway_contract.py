@@ -9,7 +9,7 @@ get_test_reservation_id() to run the contract against your adapter.
 import uuid
 from abc import ABC, abstractmethod
 
-from src.adapters.ports import SmoobuGateway
+from src.ports.smoobu import SmoobuGateway
 
 
 class SmoobuGatewayContract(ABC):

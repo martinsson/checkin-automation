@@ -4,7 +4,7 @@ ReservationCache port — stores reservation metadata to avoid repeated API call
 
 from abc import ABC, abstractmethod
 
-from src.adapters.ports import ReservationInfo
+from src.ports.smoobu import ReservationInfo
 
 
 class ReservationCache(ABC):

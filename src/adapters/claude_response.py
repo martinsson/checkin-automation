@@ -9,9 +9,9 @@ import os
 
 import anthropic
 
-from src.communication.ports import CleanerQuery
-from src.domain.intent import ClassificationResult, ConversationContext
-from src.domain.response import (
+from src.ports.cleaner import CleanerQuery
+from src.ports.intent import ClassificationResult, ConversationContext
+from src.ports.response import (
     ComposedReply,
     GuestAcknowledger,
     ParsedResponse,

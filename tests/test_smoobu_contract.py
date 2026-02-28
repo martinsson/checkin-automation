@@ -14,8 +14,8 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.adapters.ports import ActiveReservation
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
+from src.ports.smoobu import ActiveReservation
+from src.simulators.smoobu import SimulatorSmoobuGateway
 from src.adapters.smoobu_client import SmoobuClient
 from tests.contracts.smoobu_gateway_contract import SmoobuGatewayContract
 

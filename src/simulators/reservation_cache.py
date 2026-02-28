@@ -2,8 +2,8 @@
 In-memory ReservationCache for testing — no database required.
 """
 
-from src.adapters.ports import ReservationInfo
-from src.domain.reservation_cache import ReservationCache
+from src.ports.smoobu import ReservationInfo
+from src.ports.reservation_cache import ReservationCache
 
 
 class InMemoryReservationCache(ReservationCache):

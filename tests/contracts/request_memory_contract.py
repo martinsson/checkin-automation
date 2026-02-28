@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from src.domain.memory import RequestMemory
+from src.ports.memory import RequestMemory
 
 
 class RequestMemoryContract(ABC):

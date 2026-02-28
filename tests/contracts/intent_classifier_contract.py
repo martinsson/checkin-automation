@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from src.domain.intent import ConversationContext, IntentClassifier
+from src.ports.intent import ConversationContext, IntentClassifier
 
 
 def _ctx() -> ConversationContext:

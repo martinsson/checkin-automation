@@ -19,8 +19,8 @@ import os
 import pytest
 
 from src.adapters.claude_intent import ClaudeIntentClassifier
-from src.adapters.simulator_intent import SimulatorIntentClassifier
-from src.domain.intent import ConversationContext
+from src.simulators.intent import SimulatorIntentClassifier
+from src.ports.intent import ConversationContext
 
 HAS_API_KEY = bool(os.environ.get("ANTHROPIC_API_KEY"))
 

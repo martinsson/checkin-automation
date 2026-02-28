@@ -10,7 +10,7 @@ import os
 
 import anthropic
 
-from src.domain.intent import (
+from src.ports.intent import (
     ClassificationResult,
     ConversationContext,
     IntentClassifier,

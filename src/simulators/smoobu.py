@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from .ports import ActiveReservation, GuestMessage, ReservationInfo, SmoobuGateway, Thread, ThreadPage
+from src.ports.smoobu import ActiveReservation, GuestMessage, ReservationInfo, SmoobuGateway, Thread, ThreadPage
 
 
 class SimulatorSmoobuGateway(SmoobuGateway):

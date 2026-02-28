@@ -13,10 +13,10 @@ import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.adapters.sqlite_memory import SqliteRequestMemory
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
-from src.adapters.ports import ActiveReservation
-from src.communication.console_notifier import ConsoleCleanerNotifier
-from src.daemon import dispatch_reviewed_drafts
+from src.simulators.smoobu import SimulatorSmoobuGateway
+from src.ports.smoobu import ActiveReservation
+from src.simulators.cleaner import ConsoleCleanerNotifier
+from src.shell.handlers.draft_dispatch import run as dispatch_reviewed_drafts
 
 
 @pytest.fixture
@@ -63,7 +63,7 @@ async def test_approved_acknowledgment_sent_via_smoobu(memory, smoobu, cleaner):
     draft_id = await _seed_draft(memory, step="acknowledgment")
     await memory.review_draft(draft_id, "ok")
 
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
 
     assert len(smoobu.sent) == 1
     res_id, subject, body = smoobu.sent[0]
@@ -80,7 +80,7 @@ async def test_approved_cleaner_query_sent_via_cleaner(memory, smoobu, cleaner):
     draft_id = await _seed_draft(memory, step="cleaner_query")
     await memory.review_draft(draft_id, "ok")
 
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner, cleaner_name="TestCleaner")
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner, cleaner_name="TestCleaner")
 
     assert "req-1" in cleaner._sent
     query = cleaner._sent["req-1"]
@@ -103,7 +103,7 @@ async def test_rejected_with_correction_sends_actual_message(memory, smoobu, cle
     draft_id = await _seed_draft(memory, step="acknowledgment")
     await memory.review_draft(draft_id, "nok", actual_message_sent="Custom corrected text")
 
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
 
     assert len(smoobu.sent) == 1
     assert smoobu.sent[0][2] == "Custom corrected text"  # (res_id, subject, body)
@@ -115,7 +115,7 @@ async def test_rejected_without_correction_skips_but_marks_sent(memory, smoobu, 
     draft_id = await _seed_draft(memory, step="acknowledgment")
     await memory.review_draft(draft_id, "nok")
 
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
 
     assert len(smoobu.sent) == 0
     draft = await memory.get_draft(draft_id)
@@ -163,7 +163,7 @@ async def test_dispatch_error_does_not_block_other_drafts(memory, smoobu, cleane
 
     smoobu.send_message = failing_send  # type: ignore[method-assign]
 
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
 
     # First draft NOT marked sent (will retry next cycle)
     draft1 = await memory.get_draft(d1)
@@ -186,9 +186,9 @@ async def test_already_sent_draft_not_redispatched(memory, smoobu, cleaner):
     await memory.review_draft(draft_id, "ok")
 
     # First dispatch
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
     assert len(smoobu.sent) == 1
 
     # Second dispatch — should not send again
-    await dispatch_reviewed_drafts(memory, smoobu, cleaner)
+    await dispatch_reviewed_drafts(memory=memory, smoobu=smoobu, cleaner=cleaner)
     assert len(smoobu.sent) == 1

@@ -1,5 +1,5 @@
 """
-Daemon behaviour tests for poll_once().
+Daemon behaviour tests for poll_cycle() and the guest message poller.
 
 Uses simulators only — no network, no credentials.
 Covers: type-1 filtering, thread-based scanning, cache behaviour,
@@ -13,20 +13,19 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.adapters.ports import ActiveReservation
-from src.adapters.simulator_intent import SimulatorIntentClassifier
-from src.adapters.simulator_reservation_cache import InMemoryReservationCache
-from src.adapters.simulator_response import (
+from src.ports.smoobu import ActiveReservation
+from src.simulators.intent import SimulatorIntentClassifier
+from src.simulators.reservation_cache import InMemoryReservationCache
+from src.simulators.response import (
     SimulatorGuestAcknowledger,
     SimulatorReplyComposer,
     SimulatorResponseParser,
 )
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
+from src.simulators.smoobu import SimulatorSmoobuGateway
 from src.adapters.sqlite_memory import SqliteRequestMemory
-from src.communication.console_notifier import ConsoleCleanerNotifier
-from src.pipeline import Pipeline, PipelineConfig
+from src.simulators.cleaner import ConsoleCleanerNotifier
 
-from src.daemon import poll_once
+from src.shell.main_cycle import poll_cycle
 
 
 APARTMENT_ID = 42
@@ -61,17 +60,38 @@ def cleaner():
 
 
 @pytest.fixture
-def pipeline(cleaner):
-    cfg = PipelineConfig(
-        cleaner=cleaner,
-        classifier=SimulatorIntentClassifier(),
-        acknowledger=SimulatorGuestAcknowledger(),
-        parser=SimulatorResponseParser(),
-        composer=SimulatorReplyComposer(),
-        memory=SqliteRequestMemory(":memory:"),
-        cleaner_name="TestCleaner",
+def memory():
+    return SqliteRequestMemory(":memory:")
+
+
+@pytest.fixture
+def classifier():
+    return SimulatorIntentClassifier()
+
+
+@pytest.fixture
+def acknowledger():
+    return SimulatorGuestAcknowledger()
+
+
+@pytest.fixture
+def parser():
+    return SimulatorResponseParser()
+
+
+@pytest.fixture
+def composer():
+    return SimulatorReplyComposer()
+
+
+async def _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner,
+                cutoff_days=CUTOFF_DAYS):
+    await poll_cycle(
+        smoobu=smoobu, memory=memory, cache=cache,
+        classifier=classifier, acknowledger=acknowledger,
+        parser=parser, composer=composer, cleaner=cleaner,
+        cleaner_name="TestCleaner", threads_cutoff_days=cutoff_days,
     )
-    return Pipeline(cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -80,46 +100,40 @@ def pipeline(cleaner):
 
 
 @pytest.mark.asyncio
-async def test_only_guest_messages_type1_processed(smoobu, pipeline, cache):
-    """poll_once must skip host messages (type=2)."""
+async def test_only_guest_messages_type1_processed(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
+    """poll_cycle must skip host messages (type=2)."""
     res = _make_reservation(1)
     smoobu.inject_active_reservation(res)
-    # Host message only
     smoobu.inject_guest_message(1, "Host reply", "Bonjour, bienvenue !", type=2)
 
-    memory = pipeline._cfg.memory
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts = await memory.get_pending_drafts()
     assert drafts == [], "Host-only messages must not trigger pipeline"
 
 
 @pytest.mark.asyncio
-async def test_only_last_guest_message_processed(smoobu, pipeline, cache):
-    """poll_once passes only the latest type=1 message to the pipeline."""
+async def test_only_last_guest_message_processed(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
+    """poll_cycle passes only the latest type=1 message to the handler."""
     res = _make_reservation(1)
     smoobu.inject_active_reservation(res)
     smoobu.inject_guest_message(1, "Early check-in?", "Puis-je arriver avant 15h, vers 12h ?")
     smoobu.inject_guest_message(1, "Another", "Puis-je partir tard, vers 13h ?")
 
-    memory = pipeline._cfg.memory
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts = await memory.get_pending_drafts()
-    # Only the last message (late_checkout) processed
     intents = {d.intent for d in drafts}
     assert "late_checkout" in intents
 
 
 @pytest.mark.asyncio
-async def test_reservation_with_no_messages_skipped(smoobu, pipeline, cache):
-    """poll_once skips reservations that have no messages."""
+async def test_reservation_with_no_messages_skipped(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
+    """poll_cycle skips reservations that have no messages."""
     res = _make_reservation(2)
     smoobu.inject_active_reservation(res)
-    # No messages injected
 
-    memory = pipeline._cfg.memory
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts = await memory.get_pending_drafts()
     assert drafts == []
@@ -131,15 +145,14 @@ async def test_reservation_with_no_messages_skipped(smoobu, pipeline, cache):
 
 
 @pytest.mark.asyncio
-async def test_cache_hit_avoids_get_reservation_call(smoobu, pipeline):
+async def test_cache_hit_avoids_get_reservation_call(smoobu, memory, classifier, acknowledger, parser, composer, cleaner):
     """If info is cached, get_reservation() must not be called."""
-    from src.adapters.ports import ReservationInfo
+    from src.ports.smoobu import ReservationInfo
 
     res = _make_reservation(5)
     smoobu.inject_active_reservation(res)
     smoobu.inject_guest_message(5, "Late out", "Puis-je partir tard, vers 13h ?")
 
-    # Pre-populate cache so get_reservation() on the gateway should not be needed
     cache = InMemoryReservationCache()
     cache.store(5, ReservationInfo(
         reservation_id=5,
@@ -158,20 +171,20 @@ async def test_cache_hit_avoids_get_reservation_call(smoobu, pipeline):
 
     smoobu.get_reservation = patched  # type: ignore[method-assign]
 
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     assert 5 not in get_reservation_calls, "get_reservation() must not be called on cache hit"
 
 
 @pytest.mark.asyncio
-async def test_cache_miss_stores_fetched_reservation(smoobu, pipeline):
+async def test_cache_miss_stores_fetched_reservation(smoobu, memory, classifier, acknowledger, parser, composer, cleaner):
     """On cache miss, reservation info is fetched and stored in the cache."""
     res = _make_reservation(6)
     smoobu.inject_active_reservation(res)
     smoobu.inject_guest_message(6, "Late out", "Puis-je partir tard, vers 13h ?")
 
     cache = InMemoryReservationCache()
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     stored = cache.get(6)
     assert stored is not None, "Reservation info should be stored after cache miss"
@@ -184,14 +197,13 @@ async def test_cache_miss_stores_fetched_reservation(smoobu, pipeline):
 
 
 @pytest.mark.asyncio
-async def test_threads_beyond_cutoff_not_processed(smoobu, pipeline, cache):
+async def test_threads_beyond_cutoff_not_processed(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
     """Reservations whose latest message is beyond the cutoff are skipped."""
-    from src.adapters.ports import Thread, ThreadPage
+    from src.ports.smoobu import Thread, ThreadPage
 
     res = _make_reservation(7)
     smoobu.inject_active_reservation(res)
 
-    # Override get_threads to return an old thread (10 days ago > 7-day cutoff)
     old_time = datetime.now(timezone.utc) - timedelta(days=10)
 
     def fake_get_threads(page_number=1):
@@ -208,8 +220,7 @@ async def test_threads_beyond_cutoff_not_processed(smoobu, pipeline, cache):
     smoobu.get_threads = fake_get_threads  # type: ignore[method-assign]
     smoobu.inject_guest_message(7, "Late out", "Puis-je partir tard, vers 13h ?")
 
-    memory = pipeline._cfg.memory
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts = await memory.get_pending_drafts()
     assert drafts == [], "Threads beyond cutoff must not be processed"
@@ -221,7 +232,7 @@ async def test_threads_beyond_cutoff_not_processed(smoobu, pipeline, cache):
 
 
 @pytest.mark.asyncio
-async def test_one_failing_reservation_does_not_abort_others(smoobu, pipeline, cache):
+async def test_one_failing_reservation_does_not_abort_others(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
     """An exception for reservation A must not prevent reservation B from being processed."""
     good_res = _make_reservation(10)
     smoobu.inject_active_reservation(good_res)
@@ -240,8 +251,7 @@ async def test_one_failing_reservation_does_not_abort_others(smoobu, pipeline, c
 
     smoobu.get_messages = patched_get_messages  # type: ignore[method-assign]
 
-    memory = pipeline._cfg.memory
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts = await memory.get_pending_drafts()
     assert len(drafts) >= 1
@@ -253,23 +263,21 @@ async def test_one_failing_reservation_does_not_abort_others(smoobu, pipeline, c
 
 
 @pytest.mark.asyncio
-async def test_cleaner_responses_polled_each_cycle(smoobu, pipeline, cache, cleaner):
-    """poll_once calls process_cleaner_responses() at end of cycle."""
+async def test_cleaner_responses_polled_each_cycle(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner):
+    """poll_cycle calls cleaner response handler at end of cycle."""
     res = _make_reservation(20)
     smoobu.inject_active_reservation(res)
     smoobu.inject_guest_message(20, "Early", "Puis-je arriver avant 15h, vers 12h ?")
 
-    memory = pipeline._cfg.memory
-
     # First cycle: guest message processed, drafts created
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     drafts_after_first = await memory.get_pending_drafts()
     request_id = drafts_after_first[0].request_id
 
     # Simulate cleaner reply and run another cycle
     cleaner.simulate_response(request_id, "Oui, pas de problème !")
-    await poll_once(pipeline, smoobu, cache, CUTOFF_DAYS)
+    await _poll(smoobu, memory, cache, classifier, acknowledger, parser, composer, cleaner)
 
     all_drafts = await memory.get_pending_drafts()
     steps = [d.step for d in all_drafts]

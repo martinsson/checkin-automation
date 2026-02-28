@@ -15,7 +15,7 @@ from src.adapters.claude_response import (
     ClaudeReplyComposer,
     ClaudeResponseParser,
 )
-from src.adapters.simulator_response import (
+from src.simulators.response import (
     SimulatorGuestAcknowledger,
     SimulatorReplyComposer,
     SimulatorResponseParser,

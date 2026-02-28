@@ -11,7 +11,7 @@ import os
 import pytest
 
 from src.adapters.claude_intent import ClaudeIntentClassifier
-from src.adapters.simulator_intent import SimulatorIntentClassifier
+from src.simulators.intent import SimulatorIntentClassifier
 from tests.contracts.intent_classifier_contract import IntentClassifierContract
 
 

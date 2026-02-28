@@ -11,8 +11,8 @@ The adapter contract (applies to ALL implementations) lives in:
 
 from datetime import date, timedelta
 
-from src.adapters.ports import ActiveReservation
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
+from src.ports.smoobu import ActiveReservation
+from src.simulators.smoobu import SimulatorSmoobuGateway
 
 
 def _future_res(reservation_id: int, days_ahead: int = 3) -> ActiveReservation:

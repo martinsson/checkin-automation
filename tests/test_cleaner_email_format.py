@@ -10,7 +10,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.communication.ports import CleanerQuery
+from src.ports.cleaner import CleanerQuery
 
 # Same pattern used in email_notifier.py — duplicated here to avoid
 # importing email_notifier which pulls in anthropic + imapclient.

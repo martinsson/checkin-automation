@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from .ports import ActiveReservation, GuestMessage, ReservationInfo, SmoobuGateway, Thread, ThreadPage
+from src.ports.smoobu import ActiveReservation, GuestMessage, ReservationInfo, SmoobuGateway, Thread, ThreadPage
 
 BASE_URL = "https://login.smoobu.com/api"
 

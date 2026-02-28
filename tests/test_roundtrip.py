@@ -13,9 +13,9 @@ No network, no credentials, no mocking framework. Uses:
 
 import pytest
 
-from src.adapters.simulator_smoobu import SimulatorSmoobuGateway
-from src.communication.console_notifier import ConsoleCleanerNotifier
-from src.communication.ports import CleanerQuery
+from src.simulators.smoobu import SimulatorSmoobuGateway
+from src.simulators.cleaner import ConsoleCleanerNotifier
+from src.ports.cleaner import CleanerQuery
 
 
 RESERVATION_ID = 99999

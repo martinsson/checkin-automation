@@ -7,7 +7,7 @@ Use ":memory:" for tests, a file path for production.
 import sqlite3
 from datetime import datetime, timezone
 
-from src.domain.memory import Draft, ProcessedRequest, RequestMemory
+from src.ports.memory import Draft, ProcessedRequest, RequestMemory
 
 _MIGRATIONS = [
     "ALTER TABLE requests ADD COLUMN guest_name TEXT NOT NULL DEFAULT ''",

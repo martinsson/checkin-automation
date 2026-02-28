@@ -1,6 +1,6 @@
 import os
 
-from .ports import CleanerNotifier
+from src.ports.cleaner import CleanerNotifier
 
 
 def create_cleaner_notifier(channel: str | None = None) -> CleanerNotifier:
@@ -26,7 +26,7 @@ def create_cleaner_notifier(channel: str | None = None) -> CleanerNotifier:
         )
 
     if channel == "console":
-        from .console_notifier import ConsoleCleanerNotifier
+        from src.simulators.cleaner import ConsoleCleanerNotifier
 
         return ConsoleCleanerNotifier()
 

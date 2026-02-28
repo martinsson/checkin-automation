@@ -35,8 +35,7 @@ from src.adapters.smoobu_client import SmoobuClient
 from src.adapters.sqlite_memory import SqliteRequestMemory
 from src.adapters.sqlite_reservation_cache import SqliteReservationCache
 from src.communication.factory import create_cleaner_notifier
-from src.daemon import poll_once
-from src.pipeline import Pipeline, PipelineConfig
+from src.shell.main_cycle import poll_cycle
 
 logging.basicConfig(
     level=logging.INFO,
@@ -54,36 +53,25 @@ def _require_env(name: str) -> str:
     return value
 
 
-def build_pipeline() -> Pipeline:
-    api_key = _require_env("ANTHROPIC_API_KEY")
-    db_path = os.environ.get("DB_PATH", "data/checkin.db")
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-
-    cleaner_name = os.environ.get("CLEANER_NAME", "Virginie")
-    config = PipelineConfig(
-        cleaner=create_cleaner_notifier(),
-        classifier=ClaudeIntentClassifier(api_key=api_key),
-        acknowledger=ClaudeGuestAcknowledger(api_key=api_key),
-        parser=ClaudeResponseParser(api_key=api_key),
-        composer=ClaudeReplyComposer(api_key=api_key),
-        memory=SqliteRequestMemory(db_path=db_path),
-        cleaner_name=cleaner_name,
-    )
-    return Pipeline(config)
-
-
 async def main() -> None:
     smoobu_api_key = _require_env("SMOOBU_API_KEY")
-    _require_env("ANTHROPIC_API_KEY")  # validated here; build_pipeline() uses it
+    api_key = _require_env("ANTHROPIC_API_KEY")
     poll_interval = int(os.environ.get("POLL_INTERVAL", "60"))
     threads_cutoff_days = int(os.environ.get("THREADS_CUTOFF_DAYS", "7"))
 
     db_path = os.environ.get("DB_PATH", "data/checkin.db")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
+    cleaner_name = os.environ.get("CLEANER_NAME", "Virginie")
+
     smoobu = SmoobuClient(api_key=smoobu_api_key)
-    reservation_cache = SqliteReservationCache(db_path=db_path)
-    pipeline = build_pipeline()
+    memory = SqliteRequestMemory(db_path=db_path)
+    cache = SqliteReservationCache(db_path=db_path)
+    cleaner = create_cleaner_notifier()
+    classifier = ClaudeIntentClassifier(api_key=api_key)
+    acknowledger = ClaudeGuestAcknowledger(api_key=api_key)
+    parser = ClaudeResponseParser(api_key=api_key)
+    composer = ClaudeReplyComposer(api_key=api_key)
 
     log.info(
         "Daemon started — interval=%ds  threads_cutoff=%dd",
@@ -92,10 +80,17 @@ async def main() -> None:
     )
 
     while True:
-        await poll_once(
-            pipeline, smoobu, reservation_cache, threads_cutoff_days,
-            cleaner=pipeline._cfg.cleaner,
-            cleaner_name=pipeline._cfg.cleaner_name,
+        await poll_cycle(
+            smoobu=smoobu,
+            memory=memory,
+            cache=cache,
+            classifier=classifier,
+            acknowledger=acknowledger,
+            parser=parser,
+            composer=composer,
+            cleaner=cleaner,
+            cleaner_name=cleaner_name,
+            threads_cutoff_days=threads_cutoff_days,
         )
         log.info("Sleeping %ds …", poll_interval)
         await asyncio.sleep(poll_interval)

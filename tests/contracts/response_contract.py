@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod
 
 import pytest
 
-from src.communication.ports import CleanerQuery
-from src.domain.intent import ClassificationResult, ConversationContext
-from src.domain.response import GuestAcknowledger, ReplyComposer, ResponseParser
+from src.ports.cleaner import CleanerQuery
+from src.ports.intent import ClassificationResult, ConversationContext
+from src.ports.response import GuestAcknowledger, ReplyComposer, ResponseParser
 
 
 def _req(request_type: str = "early_checkin") -> CleanerQuery:
@@ -137,7 +137,7 @@ class ReplyComposerContract(ABC):
 
     @pytest.mark.asyncio
     async def test_yes_produces_non_empty_reply(self):
-        from src.domain.response import ParsedResponse
+        from src.ports.response import ParsedResponse
 
         composer = self.create_composer()
         parsed = ParsedResponse(
@@ -149,7 +149,7 @@ class ReplyComposerContract(ABC):
 
     @pytest.mark.asyncio
     async def test_no_produces_non_empty_reply(self):
-        from src.domain.response import ParsedResponse
+        from src.ports.response import ParsedResponse
 
         composer = self.create_composer()
         parsed = ParsedResponse(
@@ -161,7 +161,7 @@ class ReplyComposerContract(ABC):
 
     @pytest.mark.asyncio
     async def test_reply_has_confidence(self):
-        from src.domain.response import ParsedResponse
+        from src.ports.response import ParsedResponse
 
         composer = self.create_composer()
         parsed = ParsedResponse(

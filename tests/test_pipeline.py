@@ -2,22 +2,22 @@
 Full pipeline tests using all simulators.
 
 No network, no credentials, no LLM API calls.
-The test exercises the complete flow end-to-end.
+Tests exercise the complete flow end-to-end via shell handlers.
 Everything is draft-based — nothing is sent directly.
 """
 
 import pytest
 
 from src.adapters.sqlite_memory import SqliteRequestMemory
-from src.adapters.simulator_intent import SimulatorIntentClassifier
-from src.adapters.simulator_response import (
+from src.simulators.intent import SimulatorIntentClassifier
+from src.simulators.response import (
     SimulatorGuestAcknowledger,
     SimulatorReplyComposer,
     SimulatorResponseParser,
 )
-from src.communication.console_notifier import ConsoleCleanerNotifier
-from src.domain.intent import ConversationContext
-from src.pipeline import Pipeline, PipelineConfig
+from src.simulators.cleaner import ConsoleCleanerNotifier
+from src.ports.intent import ConversationContext
+from src.shell.handlers import guest_request, cleaner_response
 
 
 RESERVATION_ID = 42
@@ -46,16 +46,35 @@ def memory():
 
 
 @pytest.fixture
-def pipeline(cleaner, memory):
-    cfg = PipelineConfig(
-        cleaner=cleaner,
-        classifier=SimulatorIntentClassifier(),
-        acknowledger=SimulatorGuestAcknowledger(),
-        parser=SimulatorResponseParser(),
-        composer=SimulatorReplyComposer(),
+def classifier():
+    return SimulatorIntentClassifier()
+
+
+@pytest.fixture
+def acknowledger():
+    return SimulatorGuestAcknowledger()
+
+
+@pytest.fixture
+def parser():
+    return SimulatorResponseParser()
+
+
+@pytest.fixture
+def composer():
+    return SimulatorReplyComposer()
+
+
+async def _handle(msg, memory, classifier, acknowledger, message_id):
+    return await guest_request.handle(
+        reservation_id=RESERVATION_ID,
+        message=msg,
+        context=_ctx(),
+        message_id=message_id,
         memory=memory,
+        classifier=classifier,
+        acknowledger=acknowledger,
     )
-    return Pipeline(cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -64,23 +83,19 @@ def pipeline(cleaner, memory):
 
 
 @pytest.mark.asyncio
-async def test_other_intent_is_ignored(pipeline):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_other_intent_is_ignored(memory, classifier, acknowledger):
+    result = await _handle(
         "Bonjour, quel est le code Wifi ?",
-        _ctx(),
-        message_id=10,
+        memory, classifier, acknowledger, message_id=10,
     )
     assert result.action == "ignored"
 
 
 @pytest.mark.asyncio
-async def test_early_checkin_creates_drafts(pipeline, memory):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_early_checkin_creates_drafts(memory, classifier, acknowledger):
+    result = await _handle(
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement, vers 12h ?",
-        _ctx(),
-        message_id=20,
+        memory, classifier, acknowledger, message_id=20,
     )
     assert result.action == "drafts_created"
     assert result.request_id
@@ -103,26 +118,22 @@ async def test_early_checkin_creates_drafts(pipeline, memory):
 
 
 @pytest.mark.asyncio
-async def test_same_intent_not_processed_twice(pipeline):
+async def test_same_intent_not_processed_twice(memory, classifier, acknowledger):
     msg = "J'aimerais arriver avant 15h, vers 12h si possible."
-    await pipeline.process_message(RESERVATION_ID, msg, _ctx(), message_id=30)
-    result2 = await pipeline.process_message(RESERVATION_ID, msg, _ctx(), message_id=31)
+    await _handle(msg, memory, classifier, acknowledger, message_id=30)
+    result2 = await _handle(msg, memory, classifier, acknowledger, message_id=31)
     assert result2.action == "already_processed"
 
 
 @pytest.mark.asyncio
-async def test_early_and_late_are_independent(pipeline, memory):
-    r1 = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_early_and_late_are_independent(memory, classifier, acknowledger):
+    r1 = await _handle(
         "Puis-je arriver avant 15h, vers 12h ?",
-        _ctx(),
-        message_id=40,
+        memory, classifier, acknowledger, message_id=40,
     )
-    r2 = await pipeline.process_message(
-        RESERVATION_ID,
+    r2 = await _handle(
         "Puis-je partir tard le dernier jour, vers 13h ?",
-        _ctx(),
-        message_id=41,
+        memory, classifier, acknowledger, message_id=41,
     )
     assert r1.action == "drafts_created"
     assert r2.action == "drafts_created"
@@ -133,12 +144,10 @@ async def test_early_and_late_are_independent(pipeline, memory):
 
 
 @pytest.mark.asyncio
-async def test_missing_time_drafts_followup(pipeline, memory):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_missing_time_drafts_followup(memory, classifier, acknowledger):
+    result = await _handle(
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement ?",
-        _ctx(),
-        message_id=50,
+        memory, classifier, acknowledger, message_id=50,
     )
     assert result.action == "followup_drafted"
 
@@ -156,19 +165,23 @@ async def test_missing_time_drafts_followup(pipeline, memory):
 
 
 @pytest.mark.asyncio
-async def test_cleaner_yes_creates_reply_draft(pipeline, memory, cleaner):
-    # First, trigger the pipeline to create drafts
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_cleaner_yes_creates_reply_draft(memory, classifier, acknowledger, parser, composer, cleaner):
+    result = await _handle(
         "Puis-je arriver avant 15h, vers 12h ?",
-        _ctx(),
-        message_id=60,
+        memory, classifier, acknowledger, message_id=60,
     )
 
     # Simulate cleaner responding yes
     cleaner.simulate_response(result.request_id, "Oui, pas de problème !")
 
-    results = await pipeline.process_cleaner_responses()
+    responses = await cleaner.poll_responses()
+    results = []
+    for resp in responses:
+        r = await cleaner_response.handle(
+            resp, memory=memory, parser=parser, composer=composer,
+        )
+        results.append(r)
+
     assert len(results) == 1
     assert results[0].action == "reply_drafted"
 
@@ -180,19 +193,23 @@ async def test_cleaner_yes_creates_reply_draft(pipeline, memory, cleaner):
 
 
 @pytest.mark.asyncio
-async def test_cleaner_unclear_creates_reply_draft(pipeline, memory, cleaner):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_cleaner_unclear_creates_reply_draft(memory, classifier, acknowledger, parser, composer, cleaner):
+    result = await _handle(
         "Puis-je arriver avant 15h, vers 12h ?",
-        _ctx(),
-        message_id=70,
+        memory, classifier, acknowledger, message_id=70,
     )
 
     cleaner.simulate_response(result.request_id, "Je verrai...")
 
-    results = await pipeline.process_cleaner_responses()
+    responses = await cleaner.poll_responses()
+    results = []
+    for resp in responses:
+        r = await cleaner_response.handle(
+            resp, memory=memory, parser=parser, composer=composer,
+        )
+        results.append(r)
+
     assert len(results) == 1
-    # Even unclear responses get a draft — the owner decides what to do
     assert results[0].action == "reply_drafted"
 
 
@@ -202,12 +219,10 @@ async def test_cleaner_unclear_creates_reply_draft(pipeline, memory, cleaner):
 
 
 @pytest.mark.asyncio
-async def test_owner_can_approve_draft(pipeline, memory):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_owner_can_approve_draft(memory, classifier, acknowledger):
+    await _handle(
         "Puis-je arriver avant 15h, vers 12h ?",
-        _ctx(),
-        message_id=80,
+        memory, classifier, acknowledger, message_id=80,
     )
 
     drafts = await memory.get_pending_drafts()
@@ -215,19 +230,16 @@ async def test_owner_can_approve_draft(pipeline, memory):
 
     await memory.review_draft(ack_draft.draft_id, "ok")
 
-    # Only 1 pending draft left (cleaner_query)
     remaining = await memory.get_pending_drafts()
     assert len(remaining) == 1
     assert remaining[0].step == "cleaner_query"
 
 
 @pytest.mark.asyncio
-async def test_owner_can_reject_with_correction(pipeline, memory):
-    result = await pipeline.process_message(
-        RESERVATION_ID,
+async def test_owner_can_reject_with_correction(memory, classifier, acknowledger):
+    await _handle(
         "Puis-je arriver avant 15h, vers 12h ?",
-        _ctx(),
-        message_id=90,
+        memory, classifier, acknowledger, message_id=90,
     )
 
     drafts = await memory.get_pending_drafts()
@@ -252,7 +264,7 @@ async def test_owner_can_reject_with_correction(pipeline, memory):
 
 
 @pytest.mark.asyncio
-async def test_same_message_id_not_classified_twice(memory):
+async def test_same_message_id_not_classified_twice(memory, acknowledger):
     """Same message_id on two calls → second call skips AI and returns already_processed."""
     classify_calls = []
 
@@ -261,19 +273,11 @@ async def test_same_message_id_not_classified_twice(memory):
             classify_calls.append(message)
             return await super().classify(message, context)
 
-    cfg = PipelineConfig(
-        cleaner=ConsoleCleanerNotifier(),
-        classifier=CountingClassifier(),
-        acknowledger=SimulatorGuestAcknowledger(),
-        parser=SimulatorResponseParser(),
-        composer=SimulatorReplyComposer(),
-        memory=memory,
-    )
-    p = Pipeline(cfg)
+    counting = CountingClassifier()
 
     msg = "Puis-je arriver avant 15h, vers 12h ?"
-    r1 = await p.process_message(RESERVATION_ID, msg, _ctx(), message_id=100)
-    r2 = await p.process_message(RESERVATION_ID, msg, _ctx(), message_id=100)
+    r1 = await _handle(msg, memory, counting, acknowledger, message_id=100)
+    r2 = await _handle(msg, memory, counting, acknowledger, message_id=100)
 
     assert r1.action == "drafts_created"
     assert r2.action == "already_processed"

@@ -6,8 +6,8 @@ Any implementation (in-memory, SQLite, ...) must pass these tests.
 
 from abc import ABC, abstractmethod
 
-from src.adapters.ports import ReservationInfo
-from src.domain.reservation_cache import ReservationCache
+from src.ports.smoobu import ReservationInfo
+from src.ports.reservation_cache import ReservationCache
 
 
 class ReservationCacheContract(ABC):

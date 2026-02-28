@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 import anthropic
 from imapclient import IMAPClient
 
-from .ports import CleanerNotifier, CleanerQuery, CleanerResponse
+from src.ports.cleaner import CleanerNotifier, CleanerQuery, CleanerResponse
 
 log = logging.getLogger(__name__)
 
