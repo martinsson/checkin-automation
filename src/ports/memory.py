@@ -10,13 +10,21 @@ Over time the NOK entries become training data for improving prompts.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
+
+
+class RequestStatus(str, Enum):
+    pending_ack = "pending_ack"
+    pending_cleaner = "pending_cleaner"
+    pending_reply = "pending_reply"
+    done = "done"
 
 
 @dataclass
 class ProcessedRequest:
     reservation_id: int
     intent: str          # "early_checkin" or "late_checkout"
-    status: str          # "pending_acknowledgment", "pending_cleaner", "pending_reply", "done"
+    status: RequestStatus
     created_at: datetime
     request_id: str      # correlation ID
     guest_message: str   # the original guest message
@@ -143,6 +151,11 @@ class RequestMemory(ABC):
         ...
 
     @abstractmethod
+    async def get_drafts_for_request(self, request_id: str) -> list[Draft]:
+        """Return all drafts for a given request_id, ordered by created_at."""
+        ...
+
+    @abstractmethod
     async def get_reviewed_unsent_drafts(self) -> list[Draft]:
         """Return drafts where verdict IN ('ok','nok') AND sent_at IS NULL, ordered by created_at."""
         ...
@@ -150,4 +163,16 @@ class RequestMemory(ABC):
     @abstractmethod
     async def mark_draft_sent(self, draft_id: int) -> None:
         """Set sent_at to current UTC timestamp for the given draft."""
+        ...
+
+    # -- retry / compensation --------------------------------------------------
+
+    @abstractmethod
+    async def delete_request(self, request_id: str) -> None:
+        """Delete a request and all its drafts. Used by retry script."""
+        ...
+
+    @abstractmethod
+    async def delete_seen_message(self, message_id: int) -> None:
+        """Remove the seen_messages entry so the message can be re-classified."""
         ...

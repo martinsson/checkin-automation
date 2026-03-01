@@ -16,8 +16,10 @@ from src.simulators.response import (
     SimulatorResponseParser,
 )
 from src.simulators.cleaner import ConsoleCleanerNotifier
+from src.simulators.smoobu import SimulatorSmoobuGateway
 from src.ports.intent import ConversationContext
-from src.shell.handlers import guest_request, cleaner_response
+from src.ports.memory import RequestStatus
+from src.shell.handlers import guest_request, cleaner_response, draft_dispatch
 
 
 RESERVATION_ID = 42
@@ -114,7 +116,7 @@ async def test_early_checkin_creates_drafts(memory, classifier, acknowledger):
     # Request is tracked in memory
     req = await memory.get_request(result.request_id)
     assert req is not None
-    assert req.status == "pending_acknowledgment"
+    assert req.status == RequestStatus.pending_ack
 
 
 @pytest.mark.asyncio
@@ -144,19 +146,19 @@ async def test_early_and_late_are_independent(memory, classifier, acknowledger):
 
 
 @pytest.mark.asyncio
-async def test_missing_time_drafts_followup(memory, classifier, acknowledger):
+async def test_missing_time_still_creates_drafts(memory, classifier, acknowledger):
+    """When no time is extracted, we still create ack + cleaner_query drafts."""
     result = await _handle(
         "Bonjour, serait-il possible d'accéder plus tôt à l'appartement ?",
         memory, classifier, acknowledger, message_id=50,
     )
-    assert result.action == "followup_drafted"
+    assert result.action == "drafts_created"
 
-    # A follow-up draft was saved — and no cleaner_query was created
     drafts = await memory.get_pending_drafts()
-    assert len(drafts) == 1
-    assert drafts[0].step == "followup"
-    assert "cleaner_query" not in [d.step for d in drafts]
-    assert "heure" in drafts[0].draft_body.lower() or "?" in drafts[0].draft_body
+    assert len(drafts) == 2
+    steps = [d.step for d in drafts]
+    assert "acknowledgment" in steps
+    assert "cleaner_query" in steps
 
 
 # ---------------------------------------------------------------------------
@@ -283,3 +285,103 @@ async def test_same_message_id_not_classified_twice(memory, acknowledger):
     assert r2.action == "already_processed"
     assert r2.details == "message already seen"
     assert len(classify_calls) == 1  # classifier called only once
+
+
+# ---------------------------------------------------------------------------
+# Status transitions (task 6.4)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def smoobu():
+    return SimulatorSmoobuGateway()
+
+
+@pytest.mark.asyncio
+async def test_status_pending_ack_to_pending_cleaner(memory, classifier, acknowledger, smoobu, cleaner):
+    """After both ack + cleaner_query are reviewed and dispatched, status → pending_cleaner."""
+    result = await _handle(
+        "Puis-je arriver avant 15h, vers 12h ?",
+        memory, classifier, acknowledger, message_id=200,
+    )
+    req = await memory.get_request(result.request_id)
+    assert req.status == RequestStatus.pending_ack
+
+    # Review both drafts as ok
+    drafts = await memory.get_pending_drafts()
+    for d in drafts:
+        await memory.review_draft(d.draft_id, "ok")
+
+    # Dispatch reviewed drafts
+    await draft_dispatch.run(memory=memory, smoobu=smoobu, cleaner=cleaner)
+
+    req = await memory.get_request(result.request_id)
+    assert req.status == RequestStatus.pending_cleaner
+
+
+@pytest.mark.asyncio
+async def test_status_pending_reply_to_done(memory, classifier, acknowledger, smoobu, cleaner, parser, composer):
+    """After guest_reply is dispatched, status → done."""
+    result = await _handle(
+        "Puis-je arriver avant 15h, vers 12h ?",
+        memory, classifier, acknowledger, message_id=210,
+    )
+
+    # Review + dispatch initial drafts
+    drafts = await memory.get_pending_drafts()
+    for d in drafts:
+        await memory.review_draft(d.draft_id, "ok")
+    await draft_dispatch.run(memory=memory, smoobu=smoobu, cleaner=cleaner)
+
+    # Simulate cleaner reply → creates guest_reply draft
+    cleaner.simulate_response(result.request_id, "Oui, pas de problème !")
+    responses = await cleaner.poll_responses()
+    for resp in responses:
+        await cleaner_response.handle(resp, memory=memory, parser=parser, composer=composer)
+
+    # Manually set status to pending_reply (as cleaner_response handler does)
+    req = await memory.get_request(result.request_id)
+    assert req.status == RequestStatus.pending_reply
+
+    # Review + dispatch guest_reply
+    pending = await memory.get_pending_drafts()
+    reply_draft = next(d for d in pending if d.step == "guest_reply")
+    await memory.review_draft(reply_draft.draft_id, "ok")
+    await draft_dispatch.run(memory=memory, smoobu=smoobu, cleaner=cleaner)
+
+    req = await memory.get_request(result.request_id)
+    assert req.status == RequestStatus.done
+
+
+# ---------------------------------------------------------------------------
+# Delete request and seen message (task 6.5)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_delete_seen_message(memory, classifier, acknowledger):
+    """delete_seen_message clears the dedup flag so re-classification can happen."""
+    msg = "Puis-je arriver avant 15h, vers 12h ?"
+    await _handle(msg, memory, classifier, acknowledger, message_id=300)
+
+    assert await memory.has_message_been_seen(300)
+    await memory.delete_seen_message(300)
+    assert not await memory.has_message_been_seen(300)
+
+
+@pytest.mark.asyncio
+async def test_delete_request_removes_request_and_drafts(memory, classifier, acknowledger):
+    """delete_request removes the request row and all associated drafts."""
+    result = await _handle(
+        "Puis-je arriver avant 15h, vers 12h ?",
+        memory, classifier, acknowledger, message_id=310,
+    )
+    request_id = result.request_id
+
+    drafts_before = await memory.get_drafts_for_request(request_id)
+    assert len(drafts_before) == 2
+
+    await memory.delete_request(request_id)
+
+    assert await memory.get_request(request_id) is None
+    assert await memory.get_drafts_for_request(request_id) == []

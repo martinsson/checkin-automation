@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 
 from src.domain.guest_request import (
     Actionable,
-    Followup,
     Skip,
     build_cleaner_query,
     enrich_with_context,
@@ -23,7 +22,7 @@ from src.domain.draft_dispatch import (
     plan_dispatch,
 )
 from src.ports.intent import ClassificationResult, ConversationContext
-from src.ports.memory import Draft, ProcessedRequest
+from src.ports.memory import Draft, ProcessedRequest, RequestStatus
 
 
 def _make_context(**overrides):
@@ -45,8 +44,6 @@ def _make_classification(**overrides):
         intent="early_checkin",
         confidence=0.95,
         extracted_time="14:00",
-        needs_followup=False,
-        followup_question=None,
     )
     defaults.update(overrides)
     return ClassificationResult(**defaults)
@@ -75,7 +72,7 @@ def _make_request(**overrides):
     defaults = dict(
         reservation_id=100,
         intent="early_checkin",
-        status="pending_acknowledgment",
+        status=RequestStatus.pending_ack,
         created_at=datetime.now(timezone.utc),
         request_id="req-1",
         guest_message="Can we check in at 14h?",
@@ -113,11 +110,11 @@ class TestTriage:
         assert isinstance(result, Skip)
         assert "already processed" in result.reason
 
-    def test_needs_followup_returns_followup(self):
-        cls = _make_classification(needs_followup=True, followup_question="What time?")
+    def test_no_time_still_actionable(self):
+        cls = _make_classification(extracted_time=None)
         result = triage(message_id=42, is_seen=False, classification=cls, is_processed=False)
-        assert isinstance(result, Followup)
-        assert result.question == "What time?"
+        assert isinstance(result, Actionable)
+        assert result.extracted_time is None
 
     def test_actionable_early_checkin(self):
         cls = _make_classification(intent="early_checkin", extracted_time="14:00")
@@ -160,7 +157,7 @@ class TestPlanDrafts:
         assert len(plan.drafts) == 2
         assert plan.drafts[0].step == "acknowledgment"
         assert plan.drafts[1].step == "cleaner_query"
-        assert plan.status_update.status == "pending_acknowledgment"
+        assert plan.status_update.status == RequestStatus.pending_ack
 
 
 # === build_cleaner_query() ===
@@ -190,7 +187,7 @@ class TestCleanerResponseDomain:
         req = _make_request()
         plan = plan_reply("Great news, you can check in at 14h!", req)
         assert plan.draft_step == "guest_reply"
-        assert plan.new_status == "pending_reply"
+        assert plan.new_status == RequestStatus.pending_reply
         assert plan.reservation_id == 100
 
 

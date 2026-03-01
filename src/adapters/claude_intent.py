@@ -61,6 +61,4 @@ class ClaudeIntentClassifier(IntentClassifier):
             intent=data["intent"],
             confidence=float(data.get("confidence", 0.5)),
             extracted_time=data.get("extracted_time"),
-            needs_followup=bool(data.get("needs_followup", False)),
-            followup_question=data.get("followup_question"),
         )

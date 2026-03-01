@@ -31,7 +31,7 @@ class SkipSilently:
 
 DispatchAction = SendToGuest | SendToCleaner | SkipSilently
 
-_GUEST_STEPS = {"acknowledgment", "followup", "guest_reply"}
+_GUEST_STEPS = {"acknowledgment", "guest_reply"}
 
 
 def plan_dispatch(

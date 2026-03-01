@@ -68,10 +68,8 @@ class IntentClassifierContract(ABC):
         result = await clf.classify("Can I check in early?", _ctx())
         assert result.intent in ("early_checkin", "late_checkout", "other")
         assert 0.0 <= result.confidence <= 1.0
-        assert isinstance(result.needs_followup, bool)
-        # followup_question must be set when needs_followup is True
-        if result.needs_followup:
-            assert result.followup_question is not None
+        # extracted_time is optional (str | None)
+        assert result.extracted_time is None or isinstance(result.extracted_time, str)
 
     @pytest.mark.asyncio
     async def test_time_extracted_when_mentioned(self):

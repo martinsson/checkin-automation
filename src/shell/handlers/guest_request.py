@@ -10,7 +10,6 @@ from typing import Literal
 
 from src.domain.guest_request import (
     Actionable,
-    Followup,
     Skip,
     build_cleaner_query,
     enrich_with_context,
@@ -29,7 +28,6 @@ class HandleResult:
     action: Literal[
         "ignored",
         "already_processed",
-        "followup_drafted",
         "drafts_created",
     ]
     details: str = ""
@@ -90,21 +88,6 @@ async def handle(
 
     # Enrich with context
     enrich_with_context(result, context)
-
-    if isinstance(result, Followup):
-        # Save request + followup draft
-        await memory.save_request(
-            reservation_id, result.intent, result.request_id, message,
-            guest_name=context.guest_name, property_name=context.property_name,
-            original_time=result.original_time, requested_time=result.requested_time,
-            relevant_date=result.relevant_date,
-        )
-        followup_draft_id = await memory.save_draft(
-            result.request_id, reservation_id, result.intent,
-            "followup", result.question,
-        )
-        log.info("res=%d intent=%s followup draft=%d", reservation_id, result.intent, followup_draft_id)
-        return HandleResult(action="followup_drafted", details=result.question, request_id=result.request_id)
 
     # Actionable: compose ack (AI), build cleaner query, plan drafts
     assert isinstance(result, Actionable)

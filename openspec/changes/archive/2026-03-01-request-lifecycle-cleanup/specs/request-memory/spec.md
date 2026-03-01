@@ -1,12 +1,3 @@
-## MODIFIED Requirements
-
-### Requirement: Port location
-RequestMemory ABC and its data types (ProcessedRequest, Draft, RequestStatus) SHALL be defined in `src/ports/memory.py`.
-
-#### Scenario: Import path updated
-- **WHEN** code imports RequestMemory, ProcessedRequest, Draft, or RequestStatus
-- **THEN** the import SHALL be from `src.ports.memory`
-
 ## ADDED Requirements
 
 ### Requirement: RequestStatus enum defines all valid request states
@@ -37,3 +28,12 @@ The `status` field on `ProcessedRequest` SHALL be typed as `RequestStatus` inste
 #### Scenario: Clear seen flag
 - **WHEN** `delete_seen_message(123)` is called
 - **THEN** `is_message_seen(123)` SHALL return False
+
+## MODIFIED Requirements
+
+### Requirement: Port location
+RequestMemory ABC and its data types (ProcessedRequest, Draft, RequestStatus) SHALL be defined in `src/ports/memory.py`.
+
+#### Scenario: Import path updated
+- **WHEN** code imports RequestMemory, ProcessedRequest, Draft, or RequestStatus
+- **THEN** the import SHALL be from `src.ports.memory`

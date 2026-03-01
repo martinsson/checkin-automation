@@ -8,7 +8,7 @@ plan_reply():            Plan what draft to save for a guest reply
 from dataclasses import dataclass
 
 from src.ports.cleaner import CleanerQuery
-from src.ports.memory import ProcessedRequest
+from src.ports.memory import ProcessedRequest, RequestStatus
 
 
 @dataclass
@@ -18,7 +18,7 @@ class ReplyPlan:
     intent: str
     draft_step: str   # always "guest_reply"
     draft_body: str
-    new_status: str   # "pending_reply"
+    new_status: RequestStatus
 
 
 def rebuild_query_context(
@@ -50,5 +50,5 @@ def plan_reply(
         intent=request.intent,
         draft_step="guest_reply",
         draft_body=reply_body,
-        new_status="pending_reply",
+        new_status=RequestStatus.pending_reply,
     )

@@ -7,7 +7,7 @@ Use ":memory:" for tests, a file path for production.
 import sqlite3
 from datetime import datetime, timezone
 
-from src.ports.memory import Draft, ProcessedRequest, RequestMemory
+from src.ports.memory import Draft, ProcessedRequest, RequestMemory, RequestStatus
 
 _MIGRATIONS = [
     "ALTER TABLE requests ADD COLUMN guest_name TEXT NOT NULL DEFAULT ''",
@@ -16,6 +16,7 @@ _MIGRATIONS = [
     "ALTER TABLE requests ADD COLUMN requested_time TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE requests ADD COLUMN relevant_date TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE drafts ADD COLUMN sent_at TEXT",
+    "UPDATE requests SET status = 'pending_ack' WHERE status = 'pending_acknowledgment'",
 ]
 
 _SCHEMA = """
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS requests (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     reservation_id INTEGER NOT NULL,
     intent      TEXT NOT NULL,
-    status      TEXT NOT NULL DEFAULT 'pending_acknowledgment',
+    status      TEXT NOT NULL DEFAULT 'pending_ack',
     created_at  TEXT NOT NULL,
     request_id  TEXT NOT NULL UNIQUE,
     guest_message TEXT NOT NULL,
@@ -117,10 +118,11 @@ class SqliteRequestMemory(RequestMemory):
     ) -> None:
         self._conn.execute(
             "INSERT INTO requests"
-            " (reservation_id, intent, request_id, guest_message, created_at,"
+            " (reservation_id, intent, status, request_id, guest_message, created_at,"
             "  guest_name, property_name, original_time, requested_time, relevant_date)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (reservation_id, intent, request_id, guest_message, _now(),
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (reservation_id, intent, RequestStatus.pending_ack.value, request_id,
+             guest_message, _now(),
              guest_name, property_name, original_time, requested_time, relevant_date),
         )
         self._conn.commit()
@@ -152,7 +154,7 @@ class SqliteRequestMemory(RequestMemory):
         return ProcessedRequest(
             reservation_id=row["reservation_id"],
             intent=row["intent"],
-            status=row["status"],
+            status=RequestStatus(row["status"]),
             created_at=_parse_dt(row["created_at"]),
             request_id=row["request_id"],
             guest_message=row["guest_message"],
@@ -210,6 +212,13 @@ class SqliteRequestMemory(RequestMemory):
         )
         self._conn.commit()
 
+    async def get_drafts_for_request(self, request_id: str) -> list[Draft]:
+        rows = self._conn.execute(
+            "SELECT * FROM drafts WHERE request_id = ? ORDER BY created_at",
+            (request_id,),
+        ).fetchall()
+        return [self._row_to_draft(r) for r in rows]
+
     async def get_reviewed_unsent_drafts(self) -> list[Draft]:
         rows = self._conn.execute(
             "SELECT * FROM drafts WHERE verdict IN ('ok', 'nok') AND sent_at IS NULL"
@@ -223,6 +232,19 @@ class SqliteRequestMemory(RequestMemory):
             (_now(), draft_id),
         )
         self._conn.commit()
+
+    # -- retry / compensation --------------------------------------------------
+
+    async def delete_request(self, request_id: str) -> None:
+        self._conn.execute("DELETE FROM drafts WHERE request_id = ?", (request_id,))
+        self._conn.execute("DELETE FROM requests WHERE request_id = ?", (request_id,))
+        self._conn.commit()
+
+    async def delete_seen_message(self, message_id: int) -> None:
+        self._conn.execute("DELETE FROM seen_messages WHERE message_id = ?", (message_id,))
+        self._conn.commit()
+
+    # -- internal helpers ------------------------------------------------------
 
     @staticmethod
     def _row_to_draft(row) -> Draft:

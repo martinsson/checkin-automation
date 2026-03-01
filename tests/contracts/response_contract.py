@@ -53,8 +53,7 @@ class GuestAcknowledgerContract(ABC):
         ack = self.create_acknowledger()
         classification = ClassificationResult(
             intent="early_checkin", confidence=0.9,
-            extracted_time="12:00", needs_followup=False,
-            followup_question=None,
+            extracted_time="12:00",
         )
         reply = await ack.compose_acknowledgment(classification, _ctx())
         assert reply.body
@@ -65,8 +64,7 @@ class GuestAcknowledgerContract(ABC):
         ack = self.create_acknowledger()
         classification = ClassificationResult(
             intent="late_checkout", confidence=0.85,
-            extracted_time="13:00", needs_followup=False,
-            followup_question=None,
+            extracted_time="13:00",
         )
         reply = await ack.compose_acknowledgment(classification, _ctx())
         assert 0.0 <= reply.confidence <= 1.0

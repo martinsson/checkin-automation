@@ -29,8 +29,6 @@ class ClassificationResult:
     intent: Literal["early_checkin", "late_checkout", "other"]
     confidence: float                # 0.0–1.0
     extracted_time: str | None       # e.g. "12:00" if guest mentioned one
-    needs_followup: bool             # True when more info is needed
-    followup_question: str | None    # question to send back to guest
 
 
 class IntentClassifier(ABC):

@@ -77,12 +77,6 @@ class SimulatorIntentClassifier(IntentClassifier):
                 intent="early_checkin",
                 confidence=0.85,
                 extracted_time=time,
-                needs_followup=time is None,
-                followup_question=(
-                    "À quelle heure souhaitez-vous arriver ?"
-                    if time is None
-                    else None
-                ),
             )
 
         if is_late and not is_early:
@@ -90,18 +84,10 @@ class SimulatorIntentClassifier(IntentClassifier):
                 intent="late_checkout",
                 confidence=0.85,
                 extracted_time=time,
-                needs_followup=time is None,
-                followup_question=(
-                    "À quelle heure souhaitez-vous quitter l'appartement ?"
-                    if time is None
-                    else None
-                ),
             )
 
         return ClassificationResult(
             intent="other",
             confidence=0.9 if not (is_early or is_late) else 0.4,
             extracted_time=None,
-            needs_followup=False,
-            followup_question=None,
         )

@@ -1,7 +1,7 @@
 """
 Guest request domain logic — pure functions, no I/O.
 
-triage():           Should we act on this message? → Skip | Followup | Actionable
+triage():           Should we act on this message? → Skip | Actionable
 plan_drafts():      What drafts to create? → list of commands
 build_cleaner_query(): Assemble a CleanerQuery from context
 """
@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from src.ports.cleaner import CleanerQuery
 from src.ports.intent import ClassificationResult, ConversationContext
+from src.ports.memory import RequestStatus
 
 
 # --- Triage result types ---
@@ -21,32 +22,22 @@ class Skip:
 
 
 @dataclass
-class Followup:
-    request_id: str
-    intent: str
-    question: str
-    original_time: str
-    requested_time: str
-    relevant_date: str
-
-
-@dataclass
 class Actionable:
     request_id: str
     intent: str
-    extracted_time: str
+    extracted_time: str | None
     original_time: str
     relevant_date: str
 
 
-TriageResult = Skip | Followup | Actionable
+TriageResult = Skip | Actionable
 
 
 # --- Draft command types ---
 
 @dataclass
 class SaveDraft:
-    step: str   # "acknowledgment", "cleaner_query", "followup"
+    step: str   # "acknowledgment", "cleaner_query"
     body: str
 
 
@@ -110,29 +101,19 @@ def triage(
 
     request_id = str(uuid.uuid4())
 
-    if classification.needs_followup and classification.followup_question:
-        return Followup(
-            request_id=request_id,
-            intent=classification.intent,
-            question=classification.followup_question,
-            original_time="",
-            requested_time=classification.extracted_time or "?",
-            relevant_date="",
-        )
-
     return Actionable(
         request_id=request_id,
         intent=classification.intent,
-        extracted_time=classification.extracted_time or "?",
+        extracted_time=classification.extracted_time,
         original_time="",
         relevant_date="",
     )
 
 
 def enrich_with_context(
-    result: Followup | Actionable,
+    result: Actionable,
     context: ConversationContext,
-) -> Followup | Actionable:
+) -> Actionable:
     """Fill in time/date fields from conversation context. Pure."""
     original_time = (
         context.default_checkin_time
@@ -170,7 +151,7 @@ def plan_drafts(
         guest_name=context.guest_name,
         property_name=context.property_name,
         original_time=result.original_time,
-        requested_time=result.extracted_time,
+        requested_time=result.extracted_time or "",
         relevant_date=result.relevant_date,
     )
 
@@ -181,7 +162,7 @@ def plan_drafts(
 
     status_update = UpdateStatus(
         request_id=result.request_id,
-        status="pending_acknowledgment",
+        status=RequestStatus.pending_ack,
     )
 
     return DraftPlan(
@@ -205,7 +186,7 @@ def build_cleaner_query(
         property_name=context.property_name,
         request_type=result.intent,
         original_time=result.original_time,
-        requested_time=result.extracted_time,
+        requested_time=result.extracted_time or "",
         date=result.relevant_date,
         message=message,
     )

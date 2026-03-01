@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Pure plan_dispatch function routes a draft to a dispatch action
 `plan_dispatch()` SHALL be a pure, synchronous function that takes a `Draft` and an optional `ProcessedRequest`, and returns one of: `SendToGuest(reservation_id, body)`, `SendToCleaner(query: CleanerQuery)`, or `SkipSilently(draft_id, reason)`. No I/O.
@@ -18,6 +18,8 @@
 #### Scenario: Rejected without correction returns SkipSilently
 - **WHEN** `plan_dispatch()` is called with a draft where `verdict="nok"` and `actual_message_sent` is None
 - **THEN** it SHALL return `SkipSilently` with the draft_id and a reason
+
+## ADDED Requirements
 
 ### Requirement: Draft dispatch handler updates request status after sends
 After dispatching all reviewed drafts for a request, the handler SHALL check whether to advance the request status.

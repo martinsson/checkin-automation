@@ -43,3 +43,7 @@ The guest request handler and cleaner response handler SHALL never call `SmoobuG
 ### Requirement: Process cleaner responses and draft guest replies
 **Reason**: Moves to `shell/handlers/cleaner_response.py` which orchestrates the I/O, and `domain/cleaner_response.py` which provides `rebuild_query_context()` and `plan_reply()`.
 **Migration**: Same behavior, split across shell handler (I/O) and domain function (decisions).
+
+### Requirement: Followup draft handling in guest request handler
+**Reason**: The followup path is removed. The handler no longer creates followup drafts or returns `followup_drafted`.
+**Migration**: Remove the `isinstance(result, Followup)` branch from `src/shell/handlers/guest_request.py`. The handler only handles `Skip` and `Actionable` results.
