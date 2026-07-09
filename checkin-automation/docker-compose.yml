@@ -1,3 +1,7 @@
+# env_file is `.env` (adjacent to this file), not the central repo-root ../.env.
+# On the server, `make deploy` rsyncs this module to REMOTE_DIR and `.env` is scp'd
+# alongside it, so `.env` resolves there. For LOCAL docker runs, copy ../.env here first
+# (`cp ../.env .env`); for normal local dev use `make run`, which sources ../.env directly.
 services:
   daemon:
     build: .

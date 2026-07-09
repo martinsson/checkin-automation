@@ -1,5 +1,17 @@
 # Project: checking-automation
 
+This repo is the **coordination hub** for a short-term-rental tech stack. It has two modules:
+
+- **`integrations/`** — no-code coordination knowledge: how Smoobu, Beds24, igloohome, Make,
+  PriceLabs, and HostBuddy fit together, plus the account/config IDs. Start at
+  [`integrations/README.md`](integrations/README.md).
+- **`checkin-automation/`** — the Python app (everything below this section describes it).
+  Run/test from inside that directory.
+
+Credentials live centrally at the repo root (`.env`, `secrets/`), catalogued in the gitignored
+[`secrets/access-map.md`](secrets/access-map.md). A future split into two repos is intended to
+be a clean `git mv`.
+
 ## Business Intent
 
 The core purpose of this system is two things:
@@ -37,6 +49,10 @@ Guest message (Smoobu)
   - `GET  /reservations/{id}/messages` — fetch message thread
   - `POST /reservations/{id}/messages/send-message-to-guest` — send to guest
 
+## Door codes
+
+Door-code generation/delivery is handled in Beds24 + igloohome + Make, outside the app. See [integrations/door-codes.md](integrations/door-codes.md).
+
 ### Testing strategy
 
 Every port has:
@@ -51,6 +67,6 @@ The orchestrator is tested with all simulators — no network, no credentials, n
 
 - Python 3.11+, async/await throughout
 - Claude API (Haiku for intent/response, via `anthropic` SDK)
-- SQLite for persistence (`data/checkin.db`), in-memory (`:memory:`) for tests
+- SQLite for persistence (`checkin-automation/data/checkin.db`), in-memory (`:memory:`) for tests
 - Port/adapter architecture — every external dependency behind an ABC
 - pytest + pytest-asyncio, simulator adapters for network-free tests

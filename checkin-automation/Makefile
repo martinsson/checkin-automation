@@ -22,12 +22,13 @@ IGNORE_TESTS := \
 test:
 	python -m pytest tests/ -v $(IGNORE_TESTS)
 
-# Integration tests — requires .env with SMOOBU_API_KEY, ANTHROPIC_API_KEY, etc.
+# Integration tests — requires ../.env with SMOOBU_API_KEY, ANTHROPIC_API_KEY, etc.
+# Credentials live centrally at the repo root (see ../secrets/access-map.md).
 test-integration:
-	set -a && source .env && set +a && python -m pytest tests/ -v -s
+	set -a && source ../.env && set +a && python -m pytest tests/ -v -s
 
 # ---------------------------------------------------------------------------
-# Run daemon locally (requires .env)
+# Run daemon locally (requires ../.env — central credentials at repo root)
 # Required: SMOOBU_API_KEY, ANTHROPIC_API_KEY
 # Optional: POLL_INTERVAL (default 60s), THREADS_CUTOFF_DAYS (default 7),
 #           CLEANING_STAFF_CHANNEL (default console), CLEANER_NAME (default Marie),
@@ -38,7 +39,7 @@ LOG_FILE ?= data/logs/daemon.log
 
 run:
 	mkdir -p data/logs
-	set -a && source .env && set +a && venv/bin/python scripts/run.py 2>&1 | tee -a $(LOG_FILE)
+	set -a && source ../.env && set +a && venv/bin/python scripts/run.py 2>&1 | tee -a $(LOG_FILE)
 
 # ---------------------------------------------------------------------------
 # Review drafts
@@ -55,7 +56,7 @@ review:
 # Requires: REVIEW_TOKEN env var (or in .env), DB_PATH
 # Opens at http://localhost:8000
 review-ui:
-	set -a && source .env && set +a && \
+	set -a && source ../.env && set +a && \
 	DB_PATH=$(DB_PATH) uvicorn src.web.app:app --reload --host 127.0.0.1 --port 8000
 
 # ---------------------------------------------------------------------------
@@ -63,7 +64,7 @@ review-ui:
 # ---------------------------------------------------------------------------
 
 fetch-threads:
-	set -a && source .env && set +a && python scripts/fetch_message_threads.py
+	set -a && source ../.env && set +a && python scripts/fetch_message_threads.py
 
 # ---------------------------------------------------------------------------
 # Build & Deploy to Hetzner
@@ -75,13 +76,16 @@ fetch-threads:
 # Building on the server avoids transferring 400MB+ images over SSH; the
 # server's layer cache makes rebuilds fast after the first one.
 #
+# Credentials live centrally at the repo root (../.env). The server keeps its own
+# copy next to docker-compose.yml (docker-compose reads `.env` from its own dir).
+#
 # First-time server setup (manual, once):
 #   ssh $(SERVER) 'mkdir -p $(REMOTE_DIR)'
-#   scp .env $(SERVER):$(REMOTE_DIR)/.env
+#   scp ../.env $(SERVER):$(REMOTE_DIR)/.env
 #
 # The .env file is NEVER baked into the Docker image (.dockerignore excludes it).
 # It lives only on the server and is read by docker-compose at container startup.
-# To update secrets: scp .env $(SERVER):$(REMOTE_DIR)/.env && make deploy
+# To update secrets: scp ../.env $(SERVER):$(REMOTE_DIR)/.env && make deploy
 # ---------------------------------------------------------------------------
 
 deploy:
